@@ -172,7 +172,7 @@ export const products: Product[] = [
     id: "7", name: "Lenovo IdeaPad Slim 5", brand: "Lenovo", price: 38999, originalPrice: 75000,
     image: productIdeapad, condition: "Good", subcategoryId: "lenovo-laptops", categoryId: "laptops",
     specs: { processor: "AMD Ryzen 5 5500U", ram: "8GB DDR4", storage: "512GB SSD", display: "15.6\" FHD IPS" },
-    tags: ["8GB RAM", "512GB SSD"], isNewArrival: true,
+    tags: ["8GB RAM", "512GB SSD"], isNewArrival: true, isBestDeal: true,
   },
   {
     id: "8", name: "MacBook Air M1 Silver", brand: "Apple", price: 58999, originalPrice: 92000,
