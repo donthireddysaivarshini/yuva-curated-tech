@@ -130,8 +130,13 @@ const Navbar = () => {
               <Search className="w-5 h-5" />
             </button>
           )}
-          <button className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={() => setDrawerOpen(true)} className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
             <ShoppingCart className="w-5 h-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 gradient-primary rounded-full text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
           </button>
           <button className="hidden lg:flex p-2 text-muted-foreground hover:text-foreground transition-colors">
             <User className="w-5 h-5" />
