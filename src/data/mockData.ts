@@ -160,7 +160,7 @@ export const products: Product[] = [
     id: "5", name: "HP EliteBook 840 G8", brand: "HP", price: 42500, originalPrice: 89000,
     image: productHpElite, condition: "Excellent", subcategoryId: "hp-laptops", categoryId: "laptops",
     specs: { processor: "Intel Core i5-1145G7", ram: "16GB DDR4", storage: "256GB SSD", display: "14\" FHD IPS" },
-    tags: ["16GB RAM", "256GB SSD"], isNewArrival: true,
+    tags: ["16GB RAM", "256GB SSD"], isNewArrival: true, isBestDeal: true,
   },
   {
     id: "6", name: "Dell Latitude 7490", brand: "Dell", price: 24999, originalPrice: 58000,
