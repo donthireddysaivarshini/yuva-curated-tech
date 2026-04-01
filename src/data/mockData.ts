@@ -43,6 +43,7 @@ export interface Product {
   tags: string[];
   isTrending?: boolean;
   isNewArrival?: boolean;
+  isBestDeal?: boolean;
 }
 
 export interface Store {
