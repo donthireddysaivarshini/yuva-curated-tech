@@ -166,7 +166,7 @@ export const products: Product[] = [
     id: "6", name: "Dell Latitude 7490", brand: "Dell", price: 24999, originalPrice: 58000,
     image: productDellLatitude, condition: "Like New", subcategoryId: "dell-laptops", categoryId: "laptops",
     specs: { processor: "Intel Core i5-8350U", ram: "16GB DDR4", storage: "512GB SSD", display: "14\" FHD IPS" },
-    tags: ["16GB RAM", "512GB SSD"], isNewArrival: true,
+    tags: ["16GB RAM", "512GB SSD"], isNewArrival: true, isBestDeal: true,
   },
   {
     id: "7", name: "Lenovo IdeaPad Slim 5", brand: "Lenovo", price: 38999, originalPrice: 75000,
