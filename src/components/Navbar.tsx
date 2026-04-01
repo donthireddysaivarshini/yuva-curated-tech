@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Search, User, Menu, X, ChevronDown } from "lucide-react";
 import { categories, usageCategories, topSellingProducts, gamingLaptops } from "@/data/mockData";
+import { useCart } from "@/contexts/CartContext";
 
 const MegaMenu = ({ onClose }: { onClose: () => void }) => {
   const navigate = useNavigate();
