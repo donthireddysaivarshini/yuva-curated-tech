@@ -78,6 +78,7 @@ const Navbar = () => {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const { totalItems, setDrawerOpen } = useCart();
 
   const navLinks = [
     { label: "Home", path: "/" },
