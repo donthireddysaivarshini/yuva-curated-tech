@@ -202,7 +202,7 @@ export const products: Product[] = [
     id: "12", name: "Dell Precision 7520", brand: "Dell", price: 45000, originalPrice: 95000,
     image: productDellLatitude, condition: "Good", subcategoryId: "dell-laptops", categoryId: "laptops",
     specs: { processor: "Intel Core i7-7820HQ", ram: "16GB DDR4", storage: "512GB SSD", display: "15.6\" FHD" },
-    tags: ["16GB RAM", "512GB SSD"],
+    tags: ["16GB RAM", "512GB SSD"], isBestDeal: true,
   },
 ];
 
