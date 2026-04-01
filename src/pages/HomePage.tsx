@@ -279,6 +279,7 @@ const HomePage = () => (
     <TrendingDeals />
     <TechJourney />
     <NewArrivals />
+    <BestDeals />
     <AboutSnapshot />
     <PartnersSection />
     <ReviewsSection />
