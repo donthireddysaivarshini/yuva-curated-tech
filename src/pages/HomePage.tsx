@@ -119,6 +119,28 @@ const NewArrivals = () => {
   );
 };
 
+const BestDeals = () => {
+  const bestDeals = products.filter((p) => p.isBestDeal).slice(0, 4);
+  return (
+    <section className="py-16 lg:py-24 bg-surface-low">
+      <div className="container mx-auto px-6">
+        <div className="flex justify-between items-end mb-10">
+          <div>
+            <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">Best Deals on Budget</h2>
+            <p className="text-muted-foreground mt-2">Maximum performance without breaking the bank.</p>
+          </div>
+          <Link to="/products" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all">
+            View All <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {bestDeals.map((p) => <ProductCard key={p.id} product={p} />)}
+        </div>
+      </div>
+    </section>
+  );
+};
+
 const AboutSnapshot = () => (
   <section className="py-16 lg:py-24 bg-surface-low">
     <div className="container mx-auto px-6">
@@ -257,6 +279,7 @@ const HomePage = () => (
     <TrendingDeals />
     <TechJourney />
     <NewArrivals />
+    <BestDeals />
     <AboutSnapshot />
     <PartnersSection />
     <ReviewsSection />
