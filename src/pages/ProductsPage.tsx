@@ -25,6 +25,14 @@ const ProductsPage = () => {
 
   const filtered = useMemo(() => {
     let result = [...products];
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter((p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.brand.toLowerCase().includes(q) ||
+        p.specs.processor.toLowerCase().includes(q)
+      );
+    }
     if (categoryParam) result = result.filter((p) => p.categoryId === categoryParam);
     if (subParam) result = result.filter((p) => p.subcategoryId === subParam);
     result = result.filter((p) => p.price <= priceRange);
@@ -34,7 +42,7 @@ const ProductsPage = () => {
     if (sortBy === "price-low") result.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-high") result.sort((a, b) => b.price - a.price);
     return result;
-  }, [categoryParam, subParam, priceRange, selectedConditions, selectedRam, selectedStorage, sortBy]);
+  }, [searchQuery, categoryParam, subParam, priceRange, selectedConditions, selectedRam, selectedStorage, sortBy]);
 
   const currentCategory = categories.find((c) => c.id === categoryParam);
   const currentSub = currentCategory?.subcategories.find((s) => s.id === subParam);
