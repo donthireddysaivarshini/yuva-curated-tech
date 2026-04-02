@@ -45,6 +45,7 @@ export default {
           foreground: "hsl(var(--success-foreground))",
           soft: "hsl(var(--success-soft))",
         },
+        "brand-green-light": "hsl(var(--brand-green-light))",
         muted: {
           DEFAULT: "hsl(var(--muted))",
           foreground: "hsl(var(--muted-foreground))",

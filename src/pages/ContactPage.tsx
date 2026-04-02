@@ -1,10 +1,20 @@
 import { useState } from "react";
-import { Phone, MessageCircle, Mail, MapPin, Clock } from "lucide-react";
+import { Phone, MessageCircle, Mail, MapPin, Clock, AlertTriangle } from "lucide-react";
 
 const issueTypes = ["Technical Assistance", "Order Inquiry", "Warranty Claim", "Return Request", "Bulk Order", "Other"];
+const complaintTypes = ["Product Quality", "Delivery Issue", "Wrong Item Received", "Refund Not Processed", "Warranty Claim Rejected", "Other"];
 
 const ContactPage = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", orderId: "", issueType: "Technical Assistance", message: "" });
+  const [complaint, setComplaint] = useState({ orderId: "", issueType: "Product Quality", description: "", email: "", phone: "" });
+  const [complaintSubmitted, setComplaintSubmitted] = useState(false);
+
+  const handleComplaintSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setComplaintSubmitted(true);
+    setTimeout(() => setComplaintSubmitted(false), 4000);
+    setComplaint({ orderId: "", issueType: "Product Quality", description: "", email: "", phone: "" });
+  };
 
   return (
     <>
@@ -42,8 +52,8 @@ const ContactPage = () => {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-secondary rounded-lg flex items-center justify-center shrink-0">
-                  <Mail className="w-5 h-5 text-secondary-foreground" />
+                <div className="w-10 h-10 bg-accent rounded-lg flex items-center justify-center shrink-0">
+                  <Mail className="w-5 h-5 text-accent-foreground" />
                 </div>
                 <div>
                   <h3 className="font-display font-bold text-foreground">Technical Support</h3>
@@ -61,6 +71,7 @@ const ContactPage = () => {
             </div>
 
             <div className="bg-surface-low rounded-xl p-8">
+              <h3 className="font-display font-bold text-foreground text-lg mb-6">Send us a Message</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Full Name</label>
@@ -89,7 +100,7 @@ const ContactPage = () => {
                 <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Message</label>
                 <textarea value={form.message} onChange={(e) => setForm({ ...form, message: e.target.value })} rows={4} placeholder="How can our engineers assist you today?" className="w-full mt-1.5 bg-card rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body resize-none" />
               </div>
-              <button className="w-full mt-6 bg-foreground text-primary-foreground py-3.5 rounded-lg font-display font-bold text-sm hover:opacity-90 transition-opacity">
+              <button className="w-full mt-6 gradient-primary text-primary-foreground py-3.5 rounded-lg font-display font-bold text-sm hover:opacity-90 transition-opacity">
                 Send Message
               </button>
             </div>
@@ -97,7 +108,60 @@ const ContactPage = () => {
         </div>
       </section>
 
+      {/* Complaint / Feedback Form */}
       <section className="py-16 lg:py-24 bg-surface-low">
+        <div className="container mx-auto px-6 max-w-2xl">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="w-10 h-10 rounded-lg bg-destructive/10 flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-destructive" />
+            </div>
+            <div>
+              <h2 className="font-display font-extrabold text-2xl text-foreground tracking-tight">Register a Complaint / Feedback</h2>
+              <p className="text-sm text-muted-foreground">We take every concern seriously. Fill in the details below.</p>
+            </div>
+          </div>
+
+          {complaintSubmitted && (
+            <div className="mb-6 p-4 rounded-lg bg-success-soft text-success text-sm font-medium">
+              ✓ Your complaint has been registered successfully. Our team will reach out within 24 hours.
+            </div>
+          )}
+
+          <form onSubmit={handleComplaintSubmit} className="bg-card rounded-xl p-8 shadow-ambient space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Order ID *</label>
+                <input required value={complaint.orderId} onChange={(e) => setComplaint({ ...complaint, orderId: e.target.value })} placeholder="#YUVA-0000" className="w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body" />
+              </div>
+              <div>
+                <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Issue Type *</label>
+                <select required value={complaint.issueType} onChange={(e) => setComplaint({ ...complaint, issueType: e.target.value })} className="w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body">
+                  {complaintTypes.map((t) => <option key={t}>{t}</option>)}
+                </select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Email *</label>
+                <input required type="email" value={complaint.email} onChange={(e) => setComplaint({ ...complaint, email: e.target.value })} placeholder="your@email.com" className="w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body" />
+              </div>
+              <div>
+                <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Phone *</label>
+                <input required value={complaint.phone} onChange={(e) => setComplaint({ ...complaint, phone: e.target.value })} placeholder="+91 0000000000" className="w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body" />
+              </div>
+            </div>
+            <div>
+              <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider">Description *</label>
+              <textarea required value={complaint.description} onChange={(e) => setComplaint({ ...complaint, description: e.target.value })} rows={5} placeholder="Please describe the issue in detail..." className="w-full mt-1.5 bg-surface-low rounded-lg px-4 py-2.5 text-sm outline-none focus:ring-2 focus:ring-primary/30 font-body resize-none" />
+            </div>
+            <button type="submit" className="w-full gradient-primary text-primary-foreground py-3.5 rounded-lg font-display font-bold text-sm hover:opacity-90 transition-opacity">
+              Submit Complaint
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <section className="py-16 lg:py-24">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="bg-card rounded-xl p-8 shadow-ambient">
@@ -115,7 +179,7 @@ const ContactPage = () => {
                   <p className="text-sm text-muted-foreground">Daily: 10:00 AM - 08:30 PM</p>
                 </div>
               </div>
-              <a href="https://maps.app.goo.gl/BM9uzhNAxJZ3ePAm8" target="_blank" rel="noopener noreferrer" className="inline-block mt-6 border border-primary text-primary px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:bg-primary hover:text-primary-foreground transition-colors">
+              <a href="https://maps.app.goo.gl/BM9uzhNAxJZ3ePAm8" target="_blank" rel="noopener noreferrer" className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity">
                 Get Directions
               </a>
             </div>

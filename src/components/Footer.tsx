@@ -7,7 +7,7 @@ const Footer = () => {
       <div className="container mx-auto px-6 py-16">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
           <div>
-            <h3 className="font-display font-extrabold text-lg mb-4">Yuva Computers</h3>
+            <img src="/logo.png" alt="Yuva Computers" className="h-10 w-auto brightness-0 invert mb-4" />
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               Elevating the standard of refurbished technology. Precision certified, journalistically curated, and built for the modern professional.
             </p>
