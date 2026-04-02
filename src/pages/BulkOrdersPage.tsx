@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Truck, Settings, Shield, CheckCircle } from "lucide-react";
 import bulkHero from "@/assets/bulk-orders-hero.jpg";
-
+import deploy from "@/assets/deploy.png";
 const benefits = [
   { icon: Truck, title: "Dedicated Account Manager", desc: "Personalized support tailored to your procurement cycle, ensuring seamless delivery and setup." },
   { icon: Settings, title: "Custom Configurations", desc: "Upgrade RAM, storage, or software pre-installs to meet the specific technical needs of your workforce." },
@@ -128,9 +128,9 @@ const BulkOrdersPage = () => {
       <section id="inventory" className="py-16 lg:py-24">
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="bg-surface-low rounded-xl p-8 aspect-[4/3] flex items-center justify-center">
-              <p className="text-muted-foreground text-sm">Inventory showcase</p>
-            </div>
+            <div className="rounded-xl overflow-hidden aspect-[4/3] shadow-ambient">
+  <img src={deploy} alt="Inventory Deployment Showcase" className="w-full h-full object-cover" />
+</div>
             <div>
               <span className="text-xs font-display font-semibold text-primary uppercase tracking-[0.2em]">Inventory Focus</span>
               <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight mt-2">Ready for Deployment.</h2>

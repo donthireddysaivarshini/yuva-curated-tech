@@ -3,18 +3,22 @@ import { ArrowRight, Star, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Ey
 import { useState, useEffect, useCallback } from "react";
 import { products, stats, partners, reviews, blogPosts, faqs, categoryImages } from "@/data/mockData";
 import ProductCarousel from "@/components/ProductCarousel";
+import ProductCard from "@/components/ProductCard";
+import { motion } from "framer-motion";
+import blogImg1 from "@/assets/hero-laptop.jpg";
+import blogImg2 from "@/assets/company-hero.jpg";
+import blogImg3 from "@/assets/bulk-orders-hero.jpg";
 
 const heroSlides = [
-  "/hero-placeholder.jpg",
-  "/hero-placeholder.jpg",
-  "/hero-placeholder.jpg",
+  "/hero1.png",
+  "/hero2.png",
+  "/hero3.png",
 ];
 
 const HeroSection = () => {
   const [current, setCurrent] = useState(0);
-
+  
   const next = useCallback(() => setCurrent((c) => (c + 1) % heroSlides.length), []);
-  const prev = useCallback(() => setCurrent((c) => (c - 1 + heroSlides.length) % heroSlides.length), []);
 
   useEffect(() => {
     const timer = setInterval(next, 5000);
@@ -23,7 +27,7 @@ const HeroSection = () => {
 
   return (
     <section className="relative w-full overflow-hidden bg-foreground">
-      <div className="relative aspect-[21/9] md:aspect-[3/1] lg:aspect-[3/1]">
+      <div className="relative aspect-[4/3] sm:aspect-[16/9] md:aspect-[3/1] lg:aspect-[3/1]">
         {heroSlides.map((src, i) => (
           <img
             key={i}
@@ -32,12 +36,6 @@ const HeroSection = () => {
             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`}
           />
         ))}
-        <button onClick={prev} className="absolute left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/80 backdrop-blur flex items-center justify-center hover:bg-card transition-colors">
-          <ChevronLeft className="w-5 h-5 text-foreground" />
-        </button>
-        <button onClick={next} className="absolute right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card/80 backdrop-blur flex items-center justify-center hover:bg-card transition-colors">
-          <ChevronRight className="w-5 h-5 text-foreground" />
-        </button>
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
           {heroSlides.map((_, i) => (
             <button key={i} onClick={() => setCurrent(i)} className={`w-2.5 h-2.5 rounded-full transition-colors ${i === current ? "bg-primary" : "bg-card/60"}`} />
@@ -66,15 +64,15 @@ const StatsBar = () => (
 const TrendingDeals = () => {
   const trending = products.filter((p) => p.isTrending).slice(0, 8);
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-16 lg:py-24 overflow-hidden">
       <div className="container mx-auto px-6">
-        <div className="flex justify-between items-end mb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
           <div>
-            <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">Trending This Week</h2>
+            <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">Trending This Week</h2>
             <p className="text-muted-foreground mt-2">Top-rated performance machines ready for shipping.</p>
           </div>
-          <Link to="/products" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all">
-            View all Shop <ArrowRight className="w-4 h-4" />
+          <Link to="/products?filter=trending" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
+            View Trending Products <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <ProductCarousel products={trending} />
@@ -86,7 +84,7 @@ const TrendingDeals = () => {
 const TechJourney = () => (
   <section className="py-16 lg:py-24 bg-surface-low">
     <div className="container mx-auto px-6">
-      <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight text-center mb-12">Tech for Every Journey</h2>
+      <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight text-center mb-12">Tech for Every Journey</h2>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 auto-rows-[280px]">
         <Link to="/products?usage=video" className="group relative rounded-2xl overflow-hidden lg:row-span-2 lg:col-span-2">
           <img src={categoryImages.gaming} alt="Graphic Laptops" loading="lazy" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
@@ -120,12 +118,15 @@ const TechJourney = () => (
 const NewArrivals = () => {
   const newArrivals = products.filter((p) => p.isNewArrival).slice(0, 8);
   return (
-    <section className="py-16 lg:py-24">
+    <section className="py-16 lg:py-24 overflow-hidden">
       <div className="container mx-auto px-6">
-        <div className="flex justify-between items-end mb-10">
-          <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">New Arrivals</h2>
-          <Link to="/products" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all">
-            View All <ArrowRight className="w-4 h-4" />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
+          <div>
+            <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">New Arrivals</h2>
+            <p className="text-muted-foreground mt-2">The latest tech, newly certified and ready.</p>
+          </div>
+          <Link to="/products?filter=new-arrivals" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
+            View New Products <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <ProductCarousel products={newArrivals} />
@@ -137,15 +138,15 @@ const NewArrivals = () => {
 const BestDeals = () => {
   const bestDeals = products.filter((p) => p.isBestDeal).slice(0, 8);
   return (
-    <section className="py-16 lg:py-24 bg-surface-low">
+    <section className="py-16 lg:py-24 bg-surface-low overflow-hidden">
       <div className="container mx-auto px-6">
-        <div className="flex justify-between items-end mb-10">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
           <div>
-            <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">Best Deals on Budget</h2>
+            <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">Best Deals on Budget</h2>
             <p className="text-muted-foreground mt-2">Maximum performance without breaking the bank.</p>
           </div>
-          <Link to="/products" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all">
-            View All <ArrowRight className="w-4 h-4" />
+          <Link to="/products?filter=best-deals" className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 hover:gap-2 transition-all whitespace-nowrap">
+            View Deals Only <ArrowRight className="w-4 h-4" />
           </Link>
         </div>
         <ProductCarousel products={bestDeals} />
@@ -157,7 +158,7 @@ const BestDeals = () => {
 const AboutSnapshot = () => (
   <section className="py-16 lg:py-24 bg-surface-low">
     <div className="container mx-auto px-6">
-      <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight mb-12">Crafting Excellence Since 2009</h2>
+      <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight mb-12">Crafting Excellence Since 2009</h2>
       <div className="grid lg:grid-cols-2 gap-12 items-start">
         <div className="space-y-8">
           <div className="flex items-start gap-4">
@@ -181,11 +182,14 @@ const AboutSnapshot = () => (
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="rounded-2xl overflow-hidden aspect-square bg-surface-high">
-            <img src="/hero-placeholder.jpg" alt="Workshop" className="w-full h-full object-cover" />
+            <img src="/about.png" alt="Workshop" className="w-full h-full object-cover" />
           </div>
-          <div className="rounded-2xl bg-primary p-6 flex flex-col justify-end aspect-square">
-            <h4 className="font-display font-bold text-primary-foreground text-lg uppercase">Quality Control</h4>
-            <p className="text-primary-foreground/70 text-xs mt-1 uppercase tracking-wider">We Made is Safe Work</p>
+          <div className="rounded-2xl overflow-hidden aspect-square relative bg-surface-high">
+            <img src="/about1.png" alt="Quality Control" className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/20 to-transparent p-6 flex flex-col justify-end">
+              <h4 className="font-display font-bold text-white text-lg uppercase relative z-10">Quality Control</h4>
+              <p className="text-white/70 text-xs mt-1 uppercase tracking-wider relative z-10">We Made it Safe Work</p>
+            </div>
           </div>
         </div>
       </div>
@@ -193,14 +197,31 @@ const AboutSnapshot = () => (
   </section>
 );
 
+const brandColors = ["#254fa0", "#34a1da", "#1c6a0e", "#7fc140"];
+
 const PartnersSection = () => (
-  <section className="py-16 lg:py-20 border-y border-border/30">
-    <div className="container mx-auto px-6 text-center">
-      <div className="flex flex-wrap justify-center items-center gap-12 lg:gap-20">
-        {partners.map((p) => (
-          <span key={p.name} className="font-display font-bold text-xl text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors tracking-wider">{p.name}</span>
+  <section className="py-16 lg:py-20 border-y border-border/30 overflow-hidden bg-surface">
+    <div className="container mx-auto px-6 text-center mb-8">
+      <p className="text-xs font-display font-semibold uppercase tracking-[0.2em] text-muted-foreground">Trusted by Industry Leaders</p>
+    </div>
+    <div className="relative flex overflow-hidden whitespace-nowrap w-full group">
+      <div className="absolute left-0 top-0 bottom-0 w-24 bg-gradient-to-r from-surface to-transparent z-10" />
+      <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-surface to-transparent z-10" />
+      <motion.div 
+        className="flex gap-16 lg:gap-24 items-center shrink-0 w-max"
+        animate={{ x: ["0%", "-50%"] }}
+        transition={{ repeat: Infinity, ease: "linear", duration: 25 }}
+      >
+        {[...partners, ...partners].map((p, i) => (
+          <span 
+            key={i} 
+            className="font-display font-extrabold text-2xl tracking-widest opacity-80 hover:opacity-100 transition-opacity"
+            style={{ color: brandColors[i % brandColors.length] }}
+          >
+            {p.name}
+          </span>
         ))}
-      </div>
+      </motion.div>
     </div>
   </section>
 );
@@ -209,7 +230,7 @@ const ReviewsSection = () => (
   <section className="py-16 lg:py-24">
     <div className="container mx-auto px-6">
       <div className="text-center mb-12">
-        <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">Trusted by 1 Million+ Humans</h2>
+        <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">Trusted by 1 Million+ Humans</h2>
         <p className="text-muted-foreground mt-2">Real stories from creators, developers, and students.</p>
       </div>
       <div className="grid md:grid-cols-3 gap-6">
@@ -235,41 +256,52 @@ const ReviewsSection = () => (
   </section>
 );
 
-const BlogsSection = () => (
-  <section className="py-16 lg:py-24 bg-surface-low">
-    <div className="container mx-auto px-6">
-      <div className="flex justify-between items-end mb-10">
-        <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight">Tech Journals</h2>
-        <span className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1">View Journal <ArrowRight className="w-4 h-4" /></span>
-      </div>
-      <div className="grid md:grid-cols-3 gap-6">
-        {blogPosts.map((post) => (
-          <div key={post.id} className="bg-card rounded-xl overflow-hidden shadow-ambient group">
-            <div className="aspect-[16/9] bg-surface-high" />
-            <div className="p-6">
-              <span className="text-xs text-primary font-display font-semibold uppercase">{post.category}</span>
-              <h3 className="font-display font-bold text-foreground mt-2 text-lg leading-tight">{post.title}</h3>
-              <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{post.excerpt}</p>
+const BlogsSection = () => {
+  const blogImages = [blogImg1, blogImg2, blogImg3];
+  return (
+    <section className="py-16 lg:py-24 bg-surface-low overflow-hidden">
+      <div className="container mx-auto px-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8 md:mb-10">
+          <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight">Tech Journals</h2>
+          <span className="text-primary font-display font-semibold text-sm inline-flex items-center gap-1 cursor-pointer hover:text-primary/80 transition-colors whitespace-nowrap">
+            View Journal <ArrowRight className="w-4 h-4" />
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {blogPosts.map((post, i) => (
+            <div key={post.id} className="bg-card rounded-xl overflow-hidden shadow-ambient group cursor-pointer">
+              <div className="aspect-[16/9] bg-surface-high overflow-hidden">
+                <img 
+                  src={blogImages[i % blogImages.length]} 
+                  alt={post.title} 
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+              </div>
+              <div className="p-6">
+                <span className="text-xs text-primary font-display font-semibold uppercase">{post.category}</span>
+                <h3 className="font-display font-bold text-foreground mt-2 text-lg leading-tight group-hover:text-primary transition-colors">{post.title}</h3>
+                <p className="text-muted-foreground text-sm mt-2 leading-relaxed">{post.excerpt}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 const FAQSection = () => {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   return (
     <section className="py-16 lg:py-24">
       <div className="container mx-auto px-6 max-w-3xl">
-        <h2 className="font-display font-extrabold text-3xl text-foreground tracking-tight text-center mb-12">Common Questions</h2>
+        <h2 className="font-display font-extrabold text-2xl md:text-3xl text-foreground tracking-tight text-center mb-12">Common Questions</h2>
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div key={i} className="bg-card rounded-xl shadow-ambient">
               <button onClick={() => setOpenIdx(openIdx === i ? null : i)} className="w-full flex justify-between items-center p-5 text-left">
                 <span className="font-display font-semibold text-foreground text-sm">{faq.question}</span>
-                {openIdx === i ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                {openIdx === i ? <ChevronUp className="w-4 h-4 text-muted-foreground shrink-0 ml-4" /> : <ChevronDown className="w-4 h-4 text-muted-foreground shrink-0 ml-4" />}
               </button>
               {openIdx === i && (
                 <div className="px-5 pb-5 text-muted-foreground text-sm leading-relaxed animate-fade-in">{faq.answer}</div>

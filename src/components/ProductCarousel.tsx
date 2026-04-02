@@ -17,16 +17,19 @@ const ProductCarousel = ({ products }: ProductCarouselProps) => {
   };
 
   return (
-    <div className="relative group/carousel">
+    // FIX: Added w-full to make sure it respects the parent's width constraints
+    <div className="relative group/carousel w-full">
       <button
         onClick={() => scroll("left")}
-        className="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card shadow-lg border border-border/30 flex items-center justify-center text-foreground hover:bg-muted transition-colors opacity-0 group-hover/carousel:opacity-100"
+        // FIX: Changed `flex` to `hidden md:flex`. This hides the button on mobile so `-left-4` doesn't break the screen width!
+        className="flex absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-colors opacity-100 md:opacity-0 group-hover/carousel:opacity-100"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
+      
       <div
         ref={scrollRef}
-        className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-2"
+        className="flex gap-5 overflow-x-auto scrollbar-hide scroll-smooth pb-4"
       >
         {products.map((p) => (
           <div key={p.id} className="w-[260px] shrink-0">
@@ -34,9 +37,11 @@ const ProductCarousel = ({ products }: ProductCarouselProps) => {
           </div>
         ))}
       </div>
+
       <button
         onClick={() => scroll("right")}
-        className="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card shadow-lg border border-border/30 flex items-center justify-center text-foreground hover:bg-muted transition-colors opacity-0 group-hover/carousel:opacity-100"
+        // FIX: Changed `flex` to `hidden md:flex`. Hide on mobile so `-right-4` doesn't stretch the screen!
+        className="flex absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-colors opacity-100 md:opacity-0 group-hover/carousel:opacity-100"
       >
         <ChevronRight className="w-5 h-5" />
       </button>

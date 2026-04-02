@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ShoppingCart, Search, User, Menu, X, ChevronDown } from "lucide-react";
+import { ShoppingCart, Search, User, Menu, X, ChevronDown, ChevronUp, Store } from "lucide-react";
 import { categories, usageCategories, topSellingProducts, gamingLaptops, products } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
 
@@ -77,6 +77,9 @@ const MegaMenu = ({ onClose }: { onClose: () => void }) => {
 const Navbar = () => {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [mobileProductsOpen, setMobileProductsOpen] = useState(false);
+  const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+  
   const [searchOpen, setSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<typeof products>([]);
@@ -131,12 +134,27 @@ const Navbar = () => {
   };
 
   return (
-    <header className="sticky top-0 z-50 glass-nav border-b border-border/30">
-      <div className="container mx-auto px-6 flex items-center justify-between h-16">
-        <Link to="/" className="shrink-0">
-          <img src="/logo.png" alt="Yuva Computers" className="h-10 w-auto" />
-        </Link>
+    <header className="sticky top-0 z-50 w-full glass-nav border-b border-border/30 relative">
+      <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-20 md:h-24">
+        
+        {/* LEFT SIDE: Hamburger & Logo */}
+        <div className="flex items-center gap-0 sm:gap-2 shrink-0">
+          <button
+            onClick={() => {
+              setMobileOpen(!mobileOpen);
+              setSearchOpen(false); 
+            }}
+            className="lg:hidden p-1 text-foreground shrink-0 -ml-2 mr-1"
+          >
+            {mobileOpen ? <X className="w-7 h-7" /> : <Menu className="w-7 h-7" />}
+          </button>
 
+          <Link to="/" className="shrink-0" onClick={() => setMobileOpen(false)}>
+            <img src="/logo.png" alt="Yuva Computers" className="h-16 md:h-20 lg:h-24 w-auto max-w-[160px] sm:max-w-[200px] object-contain" />
+          </Link>
+        </div>
+
+        {/* MIDDLE: Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <div
@@ -155,7 +173,9 @@ const Navbar = () => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        {/* RIGHT SIDE: Icons */}
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
+          
           {searchOpen ? (
             <div ref={searchRef} className="hidden lg:block relative">
               <form onSubmit={handleSearchSubmit} className="flex items-center bg-input rounded-lg px-3 py-1.5">
@@ -188,18 +208,30 @@ const Navbar = () => {
               )}
             </div>
           ) : (
-            <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <button 
+              onClick={() => {
+                setSearchOpen(!searchOpen);
+                setMobileOpen(false);
+              }} 
+              className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            >
               <Search className="w-5 h-5" />
             </button>
           )}
+
+          <Link to="/stores" className="lg:hidden p-2 text-muted-foreground hover:text-foreground transition-colors">
+            <Store className="w-5 h-5" />
+          </Link>
+
           <button onClick={() => setDrawerOpen(true)} className="relative p-2 text-muted-foreground hover:text-foreground transition-colors">
             <ShoppingCart className="w-5 h-5" />
             {totalItems > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-5 h-5 gradient-primary rounded-full text-primary-foreground text-[10px] font-bold flex items-center justify-center">
+              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 md:w-5 md:h-5 gradient-primary rounded-full text-primary-foreground text-[9px] md:text-[10px] font-bold flex items-center justify-center">
                 {totalItems}
               </span>
             )}
           </button>
+          
           <button className="hidden lg:flex p-2 text-muted-foreground hover:text-foreground transition-colors">
             <User className="w-5 h-5" />
           </button>
@@ -209,29 +241,116 @@ const Navbar = () => {
           >
             Find Store
           </Link>
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-foreground"
-          >
-            {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
         </div>
       </div>
 
+      {/* MOBILE SEARCH BAR DROPDOWN */}
+      {searchOpen && (
+        <div className="lg:hidden absolute top-full left-0 right-0 bg-background border-b border-border/30 p-4 shadow-md z-40 animate-fade-in overflow-hidden">
+          <form onSubmit={handleSearchSubmit} className="flex items-center bg-input rounded-lg px-4 py-2.5">
+            <Search className="w-5 h-5 text-muted-foreground shrink-0" />
+            <input
+              autoFocus
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search devices..."
+              className="bg-transparent text-sm ml-3 outline-none w-full font-body"
+            />
+          </form>
+          {searchResults.length > 0 && (
+            <div className="mt-2 bg-card rounded-lg border border-border/30 overflow-hidden">
+              {searchResults.map((p) => (
+                <Link
+                  key={p.id}
+                  to={`/product/${p.id}`}
+                  onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                  className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors"
+                >
+                  <img src={p.image} alt={p.name} className="w-8 h-8 object-contain" />
+                  <div>
+                    <p className="text-sm font-medium text-foreground">{p.name}</p>
+                    <p className="text-xs text-muted-foreground">₹{p.price.toLocaleString("en-IN")}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
       {megaOpen && <MegaMenu onClose={() => setMegaOpen(false)} />}
 
+      {/* MOBILE HAMBURGER MENU DROPDOWN */}
       {mobileOpen && (
-        <div className="lg:hidden bg-card border-t border-border/30 py-4 px-6 space-y-2 animate-fade-in">
-          {navLinks.map((link) => (
-            <Link
-              key={link.label}
-              to={link.path}
-              onClick={() => setMobileOpen(false)}
-              className="block py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <div className="lg:hidden bg-background border-t border-border/30 py-4 px-4 sm:px-6 space-y-4 animate-fade-in shadow-xl absolute top-full left-0 right-0 z-50 max-h-[85vh] overflow-y-auto overflow-x-hidden">
+          <div className="space-y-2 pt-2">
+            {navLinks.map((link) => (
+              <div key={link.label}>
+                {link.hasMega ? (
+                  <div className="flex flex-col border-b border-border/10 pb-2 mb-2">
+                    <button 
+                      onClick={() => setMobileProductsOpen(!mobileProductsOpen)}
+                      className="flex items-center justify-between py-2 text-base font-bold text-foreground w-full text-left"
+                    >
+                      {link.label}
+                      {mobileProductsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    
+                    {mobileProductsOpen && (
+                      <div className="pl-4 pb-2 space-y-2 border-l-2 border-primary/20 ml-2 mt-2 animate-fade-in">
+                        {categories.map((cat) => (
+                          <div key={cat.id} className="py-1">
+                            <button
+                              onClick={() => setExpandedCategory(expandedCategory === cat.id ? null : cat.id)}
+                              className="flex items-center justify-between w-full text-sm font-bold text-foreground py-2"
+                            >
+                              {cat.name}
+                              {expandedCategory === cat.id ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                            </button>
+                            
+                            {expandedCategory === cat.id && (
+                              <div className="pl-4 mt-1 space-y-1 animate-fade-in">
+                                {cat.subcategories.map((sub) => (
+                                  <button
+                                    key={sub.id}
+                                    onClick={() => {
+                                      setMobileOpen(false);
+                                      navigate(`/products?category=${cat.id}&sub=${sub.id}`);
+                                    }}
+                                    className="block text-sm text-muted-foreground hover:text-primary w-full text-left py-2"
+                                  >
+                                    {sub.name}
+                                  </button>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                        
+                        <button
+                          onClick={() => {
+                            setMobileOpen(false);
+                            navigate("/products");
+                          }}
+                          className="w-full text-left text-sm font-bold text-primary pt-4 pb-2"
+                        >
+                          View All Products →
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    to={link.path}
+                    onClick={() => setMobileOpen(false)}
+                    className="block py-3 text-base font-medium text-muted-foreground hover:text-foreground border-b border-border/10 last:border-0"
+                  >
+                    {link.label}
+                  </Link>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </header>
