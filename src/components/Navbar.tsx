@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ShoppingCart, Search, User, Menu, X, ChevronDown } from "lucide-react";
-import { categories, usageCategories, topSellingProducts, gamingLaptops } from "@/data/mockData";
+import { categories, usageCategories, topSellingProducts, gamingLaptops, products } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
 
 const MegaMenu = ({ onClose }: { onClose: () => void }) => {
@@ -78,6 +78,10 @@ const Navbar = () => {
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<typeof products>([]);
+  const searchRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const { totalItems, setDrawerOpen } = useCart();
 
   const navLinks = [
@@ -89,11 +93,48 @@ const Navbar = () => {
     { label: "Contact Us", path: "/contact" },
   ];
 
+  useEffect(() => {
+    if (searchQuery.trim().length > 1) {
+      const q = searchQuery.toLowerCase();
+      const filtered = products.filter(
+        (p) =>
+          p.name.toLowerCase().includes(q) ||
+          p.brand.toLowerCase().includes(q) ||
+          p.specs.processor.toLowerCase().includes(q) ||
+          p.specs.ram.toLowerCase().includes(q) ||
+          p.specs.storage.toLowerCase().includes(q)
+      );
+      setSearchResults(filtered.slice(0, 5));
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchQuery]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setSearchOpen(false);
+        setSearchQuery("");
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/products?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchOpen(false);
+      setSearchQuery("");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 glass-nav border-b border-border/30">
       <div className="container mx-auto px-6 flex items-center justify-between h-16">
-        <Link to="/" className="font-display font-extrabold text-xl text-foreground tracking-tight">
-          Yuva<span className="text-primary">Computers</span>
+        <Link to="/" className="shrink-0">
+          <img src="/logo.png" alt="Yuva Computers" className="h-10 w-auto" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
@@ -116,14 +157,35 @@ const Navbar = () => {
 
         <div className="flex items-center gap-3">
           {searchOpen ? (
-            <div className="hidden lg:flex items-center bg-input rounded-lg px-3 py-1.5">
-              <Search className="w-4 h-4 text-muted-foreground" />
-              <input
-                autoFocus
-                placeholder="Search devices..."
-                className="bg-transparent text-sm ml-2 outline-none w-48 font-body"
-                onBlur={() => setSearchOpen(false)}
-              />
+            <div ref={searchRef} className="hidden lg:block relative">
+              <form onSubmit={handleSearchSubmit} className="flex items-center bg-input rounded-lg px-3 py-1.5">
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <input
+                  autoFocus
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search devices..."
+                  className="bg-transparent text-sm ml-2 outline-none w-48 font-body"
+                />
+              </form>
+              {searchResults.length > 0 && (
+                <div className="absolute top-full mt-1 left-0 right-0 bg-card rounded-lg shadow-lg border border-border/30 overflow-hidden z-50">
+                  {searchResults.map((p) => (
+                    <Link
+                      key={p.id}
+                      to={`/product/${p.id}`}
+                      onClick={() => { setSearchOpen(false); setSearchQuery(""); }}
+                      className="flex items-center gap-3 px-4 py-2.5 hover:bg-muted transition-colors"
+                    >
+                      <img src={p.image} alt={p.name} className="w-8 h-8 object-contain" />
+                      <div>
+                        <p className="text-sm font-medium text-foreground">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">₹{p.price.toLocaleString("en-IN")}</p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
           ) : (
             <button onClick={() => setSearchOpen(true)} className="hidden lg:flex p-2 text-muted-foreground hover:text-foreground transition-colors">
