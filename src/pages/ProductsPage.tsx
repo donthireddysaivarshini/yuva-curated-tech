@@ -11,7 +11,7 @@ const conditionOptions = ["Like New", "Excellent", "Good", "Value"];
 const ProductsPage = () => {
   const [searchParams] = useSearchParams();
   const categoryParam = searchParams.get("category");
-  const subParam = searchParams.get("sub");
+  const searchQuery = searchParams.get("search");
 
   const [priceRange, setPriceRange] = useState(85000);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
