@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Phone, MessageCircle, Mail, MapPin, Clock, AlertTriangle } from "lucide-react";
+import { Phone, MessageCircle, Mail, MapPin, Clock, AlertTriangle, Wrench, ShoppingCart, MessageSquare } from "lucide-react";
 
 const issueTypes = ["Technical Assistance", "Order Inquiry", "Warranty Claim", "Return Request", "Bulk Order", "Other"];
 const complaintTypes = ["Product Quality", "Delivery Issue", "Wrong Item Received", "Refund Not Processed", "Warranty Claim Rejected", "Other"];
@@ -16,6 +16,12 @@ const ContactPage = () => {
     setComplaint({ orderId: "", issueType: "Product Quality", description: "", email: "", phone: "" });
   };
 
+  const departmentNumbers = [
+    { label: "For Service", number: "+91 9347145456", icon: Wrench },
+    { label: "For Sales", number: "+91 9709888456", icon: ShoppingCart },
+    { label: "For Complaints or Feedback", number: "+91 9030539456", icon: MessageSquare },
+  ];
+
   return (
     <>
       <section className="py-16 lg:py-24 bg-surface-low">
@@ -29,15 +35,19 @@ const ContactPage = () => {
         <div className="container mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-16">
             <div className="space-y-8">
-              <div className="flex items-start gap-4">
-                <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shrink-0">
-                  <Phone className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold text-foreground">Phone Support</h3>
-                  <p className="text-sm text-muted-foreground">Mon - Sat, 10am - 7pm</p>
-                  <a href="tel:09709888456" className="text-primary font-display font-semibold text-lg mt-1 block">09709888456</a>
-                </div>
+              {/* Department Numbers */}
+              <div className="space-y-5">
+                {departmentNumbers.map((dept) => (
+                  <div key={dept.label} className="flex items-start gap-4">
+                    <div className="w-10 h-10 gradient-primary rounded-lg flex items-center justify-center shrink-0">
+                      <dept.icon className="w-5 h-5 text-primary-foreground" />
+                    </div>
+                    <div>
+                      <h3 className="font-display font-bold text-foreground">{dept.label}</h3>
+                      <a href={`tel:${dept.number.replace(/\s/g, "")}`} className="text-primary font-display font-semibold text-lg mt-0.5 block">{dept.number}</a>
+                    </div>
+                  </div>
+                ))}
               </div>
 
               <div className="flex items-start gap-4">
@@ -56,9 +66,9 @@ const ContactPage = () => {
                   <Mail className="w-5 h-5 text-accent-foreground" />
                 </div>
                 <div>
-                  <h3 className="font-display font-bold text-foreground">Technical Support</h3>
+                  <h3 className="font-display font-bold text-foreground">Email Support</h3>
                   <p className="text-sm text-muted-foreground">Response within 4 business hours.</p>
-                  <a href="mailto:support@yuvacomputers.com" className="text-primary font-display font-semibold text-sm">support@yuvacomputers.com</a>
+                  <a href="mailto:info@yuvacomputers.in" className="text-primary font-display font-semibold text-sm">info@yuvacomputers.in</a>
                 </div>
               </div>
 
@@ -171,7 +181,7 @@ const ContactPage = () => {
                   <MapPin className="w-4 h-4 text-primary mt-1 shrink-0" />
                   <div>
                     <p className="font-display font-semibold text-foreground text-sm">Dilshuknagar Main Branch</p>
-                    <p className="text-sm text-muted-foreground">Yuva Precision Tower, Suite 402<br />Near Metro Station, Hyderabad, TS 500060</p>
+                    <p className="text-sm text-muted-foreground">Metro Pillar No. 1519, Sai Towers, 204, 2nd Floor, above Tipsy Topsy Bakery, Dilsukhnagar, Hyderabad, TS 500060</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">

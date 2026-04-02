@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Globe, Mail } from "lucide-react";
+import { MapPin, Phone, Mail, Globe } from "lucide-react";
 
 const Footer = () => {
   return (
@@ -11,22 +11,14 @@ const Footer = () => {
             <p className="text-primary-foreground/60 text-sm leading-relaxed">
               Elevating the standard of refurbished technology. Precision certified, journalistically curated, and built for the modern professional.
             </p>
-            <div className="flex gap-3 mt-6">
-              <a href="#" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
-                <Globe className="w-4 h-4" />
-              </a>
-              <a href="mailto:support@yuvacomputers.com" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors">
-                <Mail className="w-4 h-4" />
-              </a>
-            </div>
           </div>
 
           <div>
             <h4 className="font-display font-semibold text-xs uppercase tracking-widest mb-4 text-primary-foreground/40">Explore</h4>
             <ul className="space-y-3">
-              {["Products", "Bulk Orders", "Our Stores", "Tech Journal"].map((item) => (
+              {["Products", "Bulk Orders", "Our Stores", "Company"].map((item) => (
                 <li key={item}>
-                  <Link to={`/${item.toLowerCase().replace(/ /g, "-")}`} className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors">
+                  <Link to={`/${item.toLowerCase().replace(/ /g, "-").replace("our-stores", "stores")}`} className="text-sm text-primary-foreground/60 hover:text-primary-foreground transition-colors">
                     {item}
                   </Link>
                 </li>
@@ -48,16 +40,31 @@ const Footer = () => {
           </div>
 
           <div>
-            <h4 className="font-display font-semibold text-xs uppercase tracking-widest mb-4 text-primary-foreground/40">Newsletter</h4>
-            <p className="text-sm text-primary-foreground/60 mb-4">Get exclusive updates on new stock drops.</p>
-            <div className="flex">
-              <input
-                placeholder="Your email address"
-                className="flex-1 bg-primary-foreground/10 text-sm px-4 py-2.5 rounded-l-lg outline-none placeholder:text-primary-foreground/30 font-body"
-              />
-              <button className="gradient-primary px-4 py-2.5 rounded-r-lg text-sm font-semibold hover:opacity-90 transition-opacity">
-                →
-              </button>
+            <h4 className="font-display font-semibold text-xs uppercase tracking-widest mb-4 text-primary-foreground/40">Contact Us & Connect</h4>
+            <div className="space-y-3 text-sm text-primary-foreground/60">
+              <div className="flex items-start gap-2">
+                <MapPin className="w-4 h-4 mt-0.5 shrink-0 text-primary-foreground/40" />
+                <span>Metro Pillar No. 1519, Sai Towers, 204, 2nd Floor, above Tipsy Topsy Bakery, Dilsukhnagar, Hyderabad, Telangana 500060</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="w-4 h-4 shrink-0 text-primary-foreground/40" />
+                <a href="tel:9709888456" className="hover:text-primary-foreground transition-colors">9709888456</a>
+              </div>
+              <div className="flex items-center gap-2">
+                <Mail className="w-4 h-4 shrink-0 text-primary-foreground/40" />
+                <a href="mailto:info@yuvacomputers.in" className="hover:text-primary-foreground transition-colors">info@yuvacomputers.in</a>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-5">
+              <a href="https://www.facebook.com/share/1ZcCzs87wv/" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors" aria-label="Facebook">
+                <Globe className="w-4 h-4" />
+              </a>
+              <a href="https://www.instagram.com/yuva.computers" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors" aria-label="Instagram">
+                <Globe className="w-4 h-4" />
+              </a>
+              <a href="https://youtube.com/@yuvacomputers" target="_blank" rel="noopener noreferrer" className="p-2 rounded-lg bg-primary-foreground/10 hover:bg-primary-foreground/20 transition-colors" aria-label="YouTube">
+                <Globe className="w-4 h-4" />
+              </a>
             </div>
           </div>
         </div>
