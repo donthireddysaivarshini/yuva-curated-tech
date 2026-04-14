@@ -133,7 +133,10 @@ const ContactPage = () => {
 
           {complaintSubmitted && (
             <div className="mb-6 p-4 rounded-lg bg-success-soft text-success text-sm font-medium">
-              ✓ Your complaint has been registered successfully. Our team will reach out within 24 hours.
+              <div className="flex items-center gap-2">
+                <span>✓</span>
+                Your complaint has been registered successfully. Our team will reach out within 24 hours.
+              </div>
             </div>
           )}
 
@@ -189,12 +192,23 @@ const ContactPage = () => {
                   <p className="text-sm text-muted-foreground">Daily: 10:00 AM - 08:30 PM</p>
                 </div>
               </div>
-              <a href="https://maps.app.goo.gl/BM9uzhNAxJZ3ePAm8" target="_blank" rel="noopener noreferrer" className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity">
+              <a href="https://maps.app.goo.gl/ChIJ3UKGZBCayzsRR8Nw_iIbU8g" target="_blank" rel="noopener noreferrer" className="inline-block mt-6 gradient-primary text-primary-foreground px-6 py-2.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity">
                 Get Directions
               </a>
             </div>
-            <div className="bg-surface-high rounded-xl aspect-[4/3] flex items-center justify-center">
-              <MapPin className="w-12 h-12 text-muted-foreground/30" />
+            
+            {/* Embedded Google Map */}
+            <div className="bg-surface-high rounded-xl overflow-hidden aspect-[4/3] shadow-ambient">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3808.0435987163013!2d78.5204646757657!3d17.373673403525235!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb9ad0648642dd%3A0xd8535b22fe70c347!2sYuva%20Computers%20-%20Dilshuknagar!5e0!3m2!1sen!2sin!4v1715712431642!5m2!1sen!2sin"
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                allowFullScreen={true}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                title="Yuva Computers Dilshuknagar Location"
+              />
             </div>
           </div>
         </div>

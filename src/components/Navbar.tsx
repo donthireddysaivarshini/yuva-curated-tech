@@ -17,9 +17,9 @@ const MegaMenu = ({ onClose }: { onClose: () => void }) => {
       <div className="container mx-auto px-6 py-8">
         <div className="grid grid-cols-5 gap-8">
           {categories.map((cat) => (
-            <div key={cat.id}>
+            <div key={cat.id} className="flex flex-col">
               <h3 className="font-display font-bold text-foreground mb-3 text-sm">{cat.name}</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2 mb-4">
                 {cat.subcategories.map((sub) => (
                   <li key={sub.id}>
                     <button
@@ -31,6 +31,13 @@ const MegaMenu = ({ onClose }: { onClose: () => void }) => {
                   </li>
                 ))}
               </ul>
+              {/* VIEW ALL FOR DESKTOP MEGA MENU */}
+              <button
+                onClick={() => { onClose(); navigate(`/products?category=${cat.id}`); }}
+                className="mt-auto text-primary font-display font-bold text-[11px] hover:underline text-left uppercase tracking-wider"
+              >
+                View All {cat.name} →
+              </button>
             </div>
           ))}
           <div>
@@ -322,6 +329,16 @@ const Navbar = () => {
                                     {sub.name}
                                   </button>
                                 ))}
+                                {/* VIEW ALL FOR MOBILE CATEGORY ACCORDION */}
+                                <button
+                                  onClick={() => {
+                                    setMobileOpen(false);
+                                    navigate(`/products?category=${cat.id}`);
+                                  }}
+                                  className="block text-sm font-bold text-primary w-full text-left py-2 border-t border-border/10 mt-2 pt-2"
+                                >
+                                  View All {cat.name} →
+                                </button>
                               </div>
                             )}
                           </div>
