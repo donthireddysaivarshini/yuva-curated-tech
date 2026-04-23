@@ -119,11 +119,14 @@ const CompanyPage = () => (
       </div>
     </section>
 
-    <section className="py-24 bg-foreground text-center">
+    <section className="py-24 bg-primary text-center">
       <div className="container mx-auto px-6">
         <h2 className="font-display font-extrabold text-4xl text-primary-foreground tracking-tight">Experience it before you buy.</h2>
-        <p className="text-primary-foreground/60 mt-4 max-w-md mx-auto">Visit our premium experience centers to test drive our curated selection of precision computing instruments.</p>
-        <Link to="/stores" className="inline-block mt-8 gradient-primary text-primary-foreground px-8 py-3.5 rounded-lg font-display font-semibold text-sm hover:opacity-90 transition-opacity">
+        <p className="text-primary-foreground/80 mt-4 max-w-md mx-auto">Visit our premium experience centers to test drive our curated selection of precision computing instruments.</p>
+        <Link 
+          to="/stores" 
+          className="inline-block mt-8 bg-background text-foreground px-8 py-3.5 rounded-lg font-display font-semibold text-sm hover:bg-white transition-colors"
+        >
           Find a Store Near You
         </Link>
       </div>

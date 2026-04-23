@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
-import { ShoppingCart, MessageSquare } from "lucide-react";
+import { ShoppingCart, MessageSquare, Target } from "lucide-react"; // Added Target icon
 import type { Product } from "@/data/mockData";
 import { useCart } from "@/contexts/CartContext";
+import { usageCategories } from "@/data/mockData";
 
 const conditionColors: Record<string, string> = {
   "Like New": "bg-primary text-primary-foreground",
@@ -12,6 +13,8 @@ const conditionColors: Record<string, string> = {
 
 const ProductCard = ({ product }: { product: Product }) => {
   const { addToCart } = useCart();
+  // Find the usage name based on ID
+  const usage = usageCategories.find(u => u.id === product.usageId);
 
   return (
     <div className="group bg-card rounded-xl overflow-hidden shadow-ambient hover:shadow-lg transition-all duration-300 flex flex-col min-w-[220px]">
@@ -29,6 +32,12 @@ const ProductCard = ({ product }: { product: Product }) => {
         </div>
       </Link>
       <div className="p-4 flex flex-col flex-1">
+        {/* Usage Badge */}
+        {usage && (
+          <div className="flex items-center gap-1 text-[10px] font-bold text-primary mb-2 uppercase tracking-wider">
+            <Target className="w-3 h-3" /> {usage.name}
+          </div>
+        )}
         <Link to={`/product/${product.id}`}>
           <h3 className="font-display font-bold text-foreground text-sm leading-tight line-clamp-2 hover:text-primary transition-colors">{product.name}</h3>
         </Link>

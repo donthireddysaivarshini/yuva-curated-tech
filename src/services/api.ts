@@ -1,0 +1,176 @@
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('yuvaToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      const isAuthRequest =
+        error.config.url.includes('/auth/login') ||
+        error.config.url.includes('/auth/google') ||
+        error.config.url.includes('/auth/signup');
+
+      if (!isAuthRequest) {
+        localStorage.removeItem('yuvaToken');
+        localStorage.removeItem('yuvaUser');
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+      }
+    }
+    return Promise.reject(error.response?.data || error);
+  }
+);
+
+// ─── AUTH ────────────────────────────────────────────────────────────────────
+export const authService = {
+  login: async (credentials: { email: string; password: string }) => {
+    const res = await api.post('/auth/login/', credentials);
+    const token = res.data.access;
+    if (token) {
+      localStorage.setItem('yuvaToken', token);
+      localStorage.setItem('yuvaUser', JSON.stringify(res.data.user));
+    }
+    return res.data;
+  },
+
+  googleLogin: async (code: string) => {
+    const res = await api.post('/auth/google/', {
+      code,
+      callback_url: 'postmessage',
+    });
+    const token = res.data.access || res.data.access_token || res.data.key;
+    if (token) {
+      localStorage.setItem('yuvaToken', token);
+    }
+    // fetch full profile after google login
+    const profile = await authService.getProfile();
+    localStorage.setItem('yuvaUser', JSON.stringify(profile));
+    return { ...res.data, user: profile };
+  },
+
+  signup: async (data: {
+    email: string;
+    password: string;
+    first_name: string;
+    last_name?: string;
+    phone?: string;
+  }) => {
+    return (await api.post('/auth/signup/', data)).data;
+  },
+
+  getProfile: async () => (await api.get('/auth/user/')).data,
+
+  updateProfile: async (data: Partial<{
+    first_name: string;
+    last_name: string;
+    phone: string;
+  }>) => {
+    const res = await api.patch('/auth/user/', data);
+    localStorage.setItem('yuvaUser', JSON.stringify(res.data));
+    return res.data;
+  },
+
+  logout: () => {
+    localStorage.removeItem('yuvaToken');
+    localStorage.removeItem('yuvaUser');
+  },
+
+  isLoggedIn: () => !!localStorage.getItem('yuvaToken'),
+
+  getStoredUser: () => {
+    const u = localStorage.getItem('yuvaUser');
+    return u ? JSON.parse(u) : null;
+  },
+
+  // Addresses
+  getSavedAddresses: async () => (await api.get('/auth/addresses/')).data,
+
+  saveAddress: async (data: any) => {
+    if (data.id) {
+      return (await api.put(`/auth/addresses/${data.id}/`, data)).data;
+    }
+    return (await api.post('/auth/addresses/', data)).data;
+  },
+
+  deleteAddress: async (id: number) =>
+    (await api.delete(`/auth/addresses/${id}/`)).data,
+
+  setDefaultAddress: async (id: number) =>
+    (await api.post(`/auth/addresses/${id}/set-default/`)).data,
+};
+
+// ─── STORE ───────────────────────────────────────────────────────────────────
+export const storeService = {
+  getProducts: async (params?: any) =>
+    (await api.get('/store/products/', { params })).data,
+
+  getProductBySlug: async (slug: string) =>
+    (await api.get(`/store/products/${slug}/`)).data,
+
+  getCategories: async (params?: any) =>
+    (await api.get('/store/categories/', { params })).data,
+
+  searchProducts: async (query: string) =>
+    (await api.get(`/store/search/?q=${query}`)).data,
+
+  getHomeData: async () => (await api.get('/store/home-data/')).data,
+
+  getSiteConfig: async () => (await api.get('/store/config/')).data,
+
+  validateCoupon: async (code: string, orderTotal: number) =>
+    (await api.post('/store/validate-coupon/', { code, order_total: orderTotal })).data,
+};
+
+// ─── ORDERS ──────────────────────────────────────────────────────────────────
+export const orderService = {
+  createCheckoutSession: async (orderData: any) =>
+    (await api.post('/orders/checkout/', orderData)).data,
+
+  getUserOrders: async (page = 1) =>
+    (await api.get(`/orders/?page=${page}`)).data,
+
+  verifyPayment: async (paymentData: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) => (await api.post('/payments/verify/', paymentData)).data,
+};
+
+// ─── CONTENT ─────────────────────────────────────────────────────────────────
+export const contentService = {
+  getWebContent: async () => (await api.get('/content/')).data,
+};
+
+// ─── CONTACT ─────────────────────────────────────────────────────────────────
+export const contactService = {
+  sendContactForm: async (data: {
+    name: string;
+    email: string;
+    phone?: string;
+    message: string;
+  }) => (await api.post('/contact/', data)).data,
+
+  sendComplaintForm: async (data: {
+    name: string;
+    email: string;
+    order_id?: string;
+    complaint: string;
+  }) => (await api.post('/contact/complaint/', data)).data,
+};
+
+export default api;

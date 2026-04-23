@@ -13,7 +13,7 @@ const ProductsPage = () => {
   const categoryParam = searchParams.get("category");
   const subParam = searchParams.get("sub");
   const searchQuery = searchParams.get("search");
-
+  const usageParam = searchParams.get("usage");
   const [priceRange, setPriceRange] = useState(85000);
   const [selectedConditions, setSelectedConditions] = useState<string[]>([]);
   const [selectedRam, setSelectedRam] = useState<string | null>(null);
@@ -35,6 +35,7 @@ const ProductsPage = () => {
     }
     if (categoryParam) result = result.filter((p) => p.categoryId === categoryParam);
     if (subParam) result = result.filter((p) => p.subcategoryId === subParam);
+    if (usageParam) result = result.filter((p) => p.usageId === usageParam);
     result = result.filter((p) => p.price <= priceRange);
     if (selectedConditions.length) result = result.filter((p) => selectedConditions.includes(p.condition));
     if (selectedRam) result = result.filter((p) => p.specs.ram.includes(selectedRam!));
@@ -42,7 +43,7 @@ const ProductsPage = () => {
     if (sortBy === "price-low") result.sort((a, b) => a.price - b.price);
     else if (sortBy === "price-high") result.sort((a, b) => b.price - a.price);
     return result;
-  }, [searchQuery, categoryParam, subParam, priceRange, selectedConditions, selectedRam, selectedStorage, sortBy]);
+  }, [searchQuery, categoryParam, subParam,usageParam, priceRange, selectedConditions, selectedRam, selectedStorage, sortBy]);
 
   const currentCategory = categories.find((c) => c.id === categoryParam);
   const currentSub = currentCategory?.subcategories.find((s) => s.id === subParam);

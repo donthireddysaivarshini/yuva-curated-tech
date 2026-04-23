@@ -24,6 +24,7 @@ export interface Subcategory {
   categoryId: string;
 }
 
+
 export interface Product {
   id: string;
   name: string;
@@ -34,16 +35,47 @@ export interface Product {
   condition: "Like New" | "Excellent" | "Good" | "Value";
   subcategoryId: string;
   categoryId: string;
+
   specs: {
     processor: string;
     ram: string;
     storage: string;
     display: string;
   };
+
+  highlights: string[];
+  description: string;
+
+  fullSpecs: Record<string, string>;
+  additionalInfo: Record<string, string>;
+
   tags: string[];
+
   isTrending?: boolean;
   isNewArrival?: boolean;
   isBestDeal?: boolean;
+
+  usageId: string;
+
+  // ✅ FIXED STRUCTURE (matches your data)
+refurbishment: {
+  summary: string;
+  points: string[];
+};
+
+warranty: {
+  summary: string;
+  details: string[];
+};
+
+  // ✅ AMAZON STYLE
+  detailedSpecs: {
+    title: string;
+    items: {
+      label: string;
+      value: string;
+    }[];
+  }[];
 }
 
 export interface Store {
@@ -131,79 +163,148 @@ export const usageCategories = [
   { id: "video", name: "Video/Graphics" },
 ];
 
+
 export const products: Product[] = [
-  {
-    id: "1", name: "MacBook Pro M2 13\"", brand: "Apple", price: 84999, originalPrice: 149000,
-    image: productMacbook, condition: "Like New", subcategoryId: "apple-laptops", categoryId: "laptops",
-    specs: { processor: "Apple M2", ram: "8GB Unified", storage: "256GB SSD", display: "13.3\" Retina" },
-    tags: ["8GB RAM", "256GB SSD"], isTrending: true,
+ {
+  id: "1",
+  name: "MacBook Pro M2 13\"",
+  brand: "Apple",
+  price: 84999,
+  originalPrice: 149000,
+  image: productMacbook,
+  condition: "Like New",
+  subcategoryId: "apple-laptops",
+  categoryId: "laptops",
+  usageId: "video",
+
+  specs: {
+    processor: "Apple M2",
+    ram: "8GB Unified",
+    storage: "256GB SSD",
+    display: "13.3\" Retina",
   },
-  {
-    id: "2", name: "Dell XPS 15 9500", brand: "Dell", price: 72500, originalPrice: 135000,
-    image: productDellXps, condition: "Excellent", subcategoryId: "dell-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i7-10750H", ram: "16GB DDR4", storage: "512GB SSD", display: "15.6\" FHD+" },
-    tags: ["16GB RAM", "512GB SSD"], isTrending: true,
+
+  tags: ["M2 Chip", "Retina Display", "Lightweight", "Premium"],
+
+  highlights: [
+    "Apple M2 chip for lightning-fast performance",
+    "13.3-inch Retina display with True Tone",
+    "Up to 20 hours battery life",
+    "Ultra-lightweight aluminum design",
+    "Silent fanless architecture",
+  ],
+
+  description:
+    "The MacBook Pro M2 is built for performance and efficiency. Whether you're editing videos, coding, or multitasking, it delivers smooth and powerful performance with exceptional battery life.",
+
+  fullSpecs: {
+    Processor: "Apple M2 Chip",
+    RAM: "8GB Unified Memory",
+    Storage: "256GB SSD",
+    Display: "13.3-inch Retina Display",
+    OperatingSystem: "macOS Ventura",
+    Battery: "Up to 20 hours",
+    Weight: "1.4 kg",
   },
-  {
-    id: "3", name: "ThinkPad X1 Carbon Gen 9", brand: "Lenovo", price: 54999, originalPrice: 125000,
-    image: productThinkpad, condition: "Like New", subcategoryId: "lenovo-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i5-1135G7", ram: "16GB DDR4", storage: "512GB SSD", display: "14\" FHD IPS" },
-    tags: ["16GB RAM", "512GB SSD"], isTrending: true,
+
+  additionalInfo: {
+    Brand: "Apple",
+    Model: "MacBook Pro M2 (2022)",
+    Color: "Silver",
+    Keyboard: "Backlit Magic Keyboard",
+    Ports: "2x Thunderbolt / USB 4",
+    CountryOfOrigin: "China",
   },
-  {
-    id: "4", name: "Asus ROG Zephyrus G14", brand: "Asus", price: 94000, originalPrice: 155000,
-    image: productAsusRog, condition: "Like New", subcategoryId: "asus-laptops", categoryId: "laptops",
-    specs: { processor: "AMD Ryzen 9 5900HS", ram: "16GB DDR4", storage: "1TB SSD", display: "14\" QHD 120Hz" },
-    tags: ["16GB RAM", "1TB SSD"], isTrending: true,
+
+  refurbishment: {
+    summary: "40+ Quality Checks Passed",
+    points: [
+      "Battery Health: 92% (Excellent)",
+      "No scratches or dents on body",
+      "Display: No dead pixels",
+      "Keyboard & Trackpad fully tested",
+      "Thermal paste reapplied for optimal cooling",
+      "Ports and connectivity verified",
+    ],
   },
-  {
-    id: "5", name: "HP EliteBook 840 G8", brand: "HP", price: 42500, originalPrice: 89000,
-    image: productHpElite, condition: "Excellent", subcategoryId: "hp-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i5-1145G7", ram: "16GB DDR4", storage: "256GB SSD", display: "14\" FHD IPS" },
-    tags: ["16GB RAM", "256GB SSD"], isNewArrival: true, isBestDeal: true,
+
+  warranty: {
+    summary: "6 Months Warranty",
+    details: [
+      "Covers all internal hardware defects",
+      "15-day no-questions-asked return policy",
+      "Free repair or replacement within warranty period",
+      "Extended warranty available up to 2 years",
+    ],
   },
-  {
-    id: "6", name: "Dell Latitude 7490", brand: "Dell", price: 24999, originalPrice: 58000,
-    image: productDellLatitude, condition: "Like New", subcategoryId: "dell-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i5-8350U", ram: "16GB DDR4", storage: "512GB SSD", display: "14\" FHD IPS" },
-    tags: ["16GB RAM", "512GB SSD"], isNewArrival: true, isBestDeal: true,
-  },
-  {
-    id: "7", name: "Lenovo IdeaPad Slim 5", brand: "Lenovo", price: 38999, originalPrice: 75000,
-    image: productIdeapad, condition: "Good", subcategoryId: "lenovo-laptops", categoryId: "laptops",
-    specs: { processor: "AMD Ryzen 5 5500U", ram: "8GB DDR4", storage: "512GB SSD", display: "15.6\" FHD IPS" },
-    tags: ["8GB RAM", "512GB SSD"], isNewArrival: true, isBestDeal: true,
-  },
-  {
-    id: "8", name: "MacBook Air M1 Silver", brand: "Apple", price: 58999, originalPrice: 92000,
-    image: productMacbook, condition: "Like New", subcategoryId: "apple-laptops", categoryId: "laptops",
-    specs: { processor: "Apple M1", ram: "8GB Unified", storage: "256GB SSD", display: "13.3\" Retina" },
-    tags: ["8GB RAM", "256GB SSD"], isNewArrival: true,
-  },
-  {
-    id: "9", name: "Legion 5 Pro Gaming", brand: "Lenovo", price: 82499, originalPrice: 155000,
-    image: productThinkpad, condition: "Like New", subcategoryId: "lenovo-laptops", categoryId: "laptops",
-    specs: { processor: "AMD Ryzen 7 5800H", ram: "32GB DDR4", storage: "1TB SSD", display: "16\" QHD 165Hz" },
-    tags: ["32GB RAM", "1TB SSD"],
-  },
-  {
-    id: "10", name: "HP ZBook 15 G6", brand: "HP", price: 62000, originalPrice: 120000,
-    image: productHpElite, condition: "Good", subcategoryId: "hp-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i7-9850H", ram: "32GB DDR4", storage: "512GB SSD", display: "15.6\" FHD" },
-    tags: ["32GB RAM", "512GB SSD"],
-  },
-  {
-    id: "11", name: "ThinkPad P15 Gen 2", brand: "Lenovo", price: 94999, originalPrice: 245000,
-    image: productThinkpad, condition: "Like New", subcategoryId: "lenovo-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Xeon W-11855M", ram: "64GB DDR4", storage: "2TB SSD", display: "15.6\" UHD" },
-    tags: ["64GB RAM", "2TB SSD"],
-  },
-  {
-    id: "12", name: "Dell Precision 7520", brand: "Dell", price: 45000, originalPrice: 95000,
-    image: productDellLatitude, condition: "Good", subcategoryId: "dell-laptops", categoryId: "laptops",
-    specs: { processor: "Intel Core i7-7820HQ", ram: "16GB DDR4", storage: "512GB SSD", display: "15.6\" FHD" },
-    tags: ["16GB RAM", "512GB SSD"], isBestDeal: true,
-  },
+
+  detailedSpecs: [
+    {
+      title: "Processor",
+      items: [
+        { label: "Processor Type", value: "Apple M2" },
+        { label: "CPU Cores", value: "8-Core CPU" },
+        { label: "GPU Cores", value: "10-Core GPU" },
+      ],
+    },
+    {
+      title: "Display",
+      items: [
+        { label: "Screen Size", value: "13.3 inch" },
+        { label: "Resolution", value: "2560 x 1600" },
+        { label: "Display Type", value: "Retina IPS" },
+        { label: "Brightness", value: "500 nits" },
+      ],
+    },
+    {
+      title: "Memory",
+      items: [
+        { label: "RAM Installed", value: "8GB" },
+        { label: "Memory Type", value: "Unified Memory" },
+      ],
+    },
+    {
+      title: "Storage",
+      items: [
+        { label: "Type", value: "SSD" },
+        { label: "Capacity", value: "256GB" },
+      ],
+    },
+    {
+      title: "Connectivity",
+      items: [
+        { label: "WiFi", value: "Wi-Fi 6" },
+        { label: "Bluetooth", value: "Bluetooth 5.0" },
+      ],
+    },
+    {
+      title: "Ports",
+      items: [
+        { label: "USB Ports", value: "2 x Thunderbolt / USB 4" },
+        { label: "Headphone Jack", value: "Yes" },
+      ],
+    },
+    {
+      title: "Battery",
+      items: [
+        { label: "Battery Life", value: "Up to 20 hours" },
+        { label: "Charging", value: "67W USB-C Adapter" },
+      ],
+    },
+    {
+      title: "Build & Design",
+      items: [
+        { label: "Weight", value: "1.4 kg" },
+        { label: "Material", value: "Aluminum" },
+        { label: "Color", value: "Silver" },
+      ],
+    },
+  ],
+
+  isTrending: true,
+  isNewArrival: true,
+  isBestDeal: false,
+}
 ];
 
 export const categoryImages = {
