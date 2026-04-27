@@ -1,3 +1,4 @@
+//yuva
 import axios from 'axios';
 
 const api = axios.create({
@@ -125,8 +126,17 @@ export const storeService = {
   getCategories: async (params?: any) =>
     (await api.get('/store/categories/', { params })).data,
 
-  searchProducts: async (query: string) =>
-    (await api.get(`/store/search/?q=${query}`)).data,
+  
+  getBrands: async () => (await api.get('/store/brands/')).data,
+  getUsageTags: async () => (await api.get('/store/usage-tags/')).data,
+  getReviews: async (slug: string) =>
+    (await api.get(`/store/products/${slug}/reviews/`)).data,
+  addReview: async (slug: string, formData: FormData) =>
+    (await api.post(`/store/products/${slug}/reviews/`, formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  })).data,
+  getBrandsForCategory: async (categorySlug: string) =>
+  (await api.get(`/store/categories/${categorySlug}/brands/`)).data,
 
   getHomeData: async () => (await api.get('/store/home-data/')).data,
 
@@ -134,21 +144,24 @@ export const storeService = {
 
   validateCoupon: async (code: string, orderTotal: number) =>
     (await api.post('/store/validate-coupon/', { code, order_total: orderTotal })).data,
+
+  // Replace existing searchProducts method
+  searchProducts: async (query: string) => {
+  if (!query.trim()) return { products: [], categories: [], brands: [], message: 'Enter search term' };
+  return (await api.get('/store/search/', { params: { q: query.trim() } })).data;
+},
 };
 
 // ─── ORDERS ──────────────────────────────────────────────────────────────────
 export const orderService = {
-  createCheckoutSession: async (orderData: any) =>
+  createOrder: async (orderData: any) =>
     (await api.post('/orders/checkout/', orderData)).data,
 
   getUserOrders: async (page = 1) =>
     (await api.get(`/orders/?page=${page}`)).data,
 
-  verifyPayment: async (paymentData: {
-    razorpay_order_id: string;
-    razorpay_payment_id: string;
-    razorpay_signature: string;
-  }) => (await api.post('/payments/verify/', paymentData)).data,
+  verifyPayment: async (paymentData: any) => 
+    (await api.post('/payments/verify/', paymentData)).data,
 };
 
 // ─── CONTENT ─────────────────────────────────────────────────────────────────

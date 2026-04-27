@@ -1,119 +1,134 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { ShieldCheck, ArrowLeft } from "lucide-react";
+//yuvacomputers
+import { useState, useEffect, useMemo } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { ShieldCheck, ArrowLeft, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
-import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
+import { orderService, storeService } from "@/services/api";
+import { toast } from "sonner";
+import AddressManager from "@/components/profile/AddressManager";
 
 const CheckoutPage = () => {
   const { items, totalPrice, clearCart } = useCart();
-  const [form, setForm] = useState({ name: "", email: "", phone: "", address: "", city: "", state: "", pincode: "" });
+  const { isLoggedIn } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [saveAsDefault, setSaveAsDefault] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState<'Online' | 'COD'>('Online');
+  const [selectedAddress, setSelectedAddress] = useState<any>(null);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  };
+  // Redirect to login if not logged in
+  useEffect(() => {
+    if (!isLoggedIn) {
+      navigate("/login", { state: { from: "/checkout" } });
+    }
+  }, [isLoggedIn, navigate, location]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    toast({ title: "Order Placed!", description: "Thank you for your purchase. Our team will contact you shortly." });
-    clearCart();
-  };
+  const calculations = useMemo(() => {
+    const codFee = paymentMethod === 'COD' ? (totalPrice * 0.02) : 0;
+    return {
+      subtotal: totalPrice,
+      codFee,
+      total: totalPrice + codFee,
+    };
+  }, [totalPrice, paymentMethod]);
 
+  const handlePlaceOrder = async () => {
+    if (!selectedAddress) {
+      toast.error("Please select a shipping address");
+      return;
+    }
+
+    setIsPlacingOrder(true);
+    try {
+      const orderData = {
+        items: items.map(item => ({ variant_id: item.productId, price: item.price, quantity: item.quantity })),
+        payment_method: paymentMethod,
+        address: `${selectedAddress.address}, ${selectedAddress.city}`,
+        phone: selectedAddress.phone
+      };
+
+      const res = await orderService.createOrder(orderData);
+
+      // Check if it's COD based on the backend response
+        if (paymentMethod === 'COD') {
+            toast.success("COD Order Placed!");
+            clearCart();
+            navigate("/profile"); 
+            return; // Stop here for COD
+        }
+
+        // Online Payment Logic
+        const options = {
+            key: res.key,
+            amount: res.amount * 100, // Razorpay uses paise
+            currency: "INR",
+            name: "Yuva Computers",
+            order_id: res.razorpay_order_id,
+            handler: async (response: any) => {
+                await orderService.verifyPayment({
+                    order_id: res.order_id,
+                    razorpay_order_id: response.razorpay_order_id,
+                    razorpay_payment_id: response.razorpay_payment_id,
+                    razorpay_signature: response.razorpay_signature
+                });
+                toast.success("Payment Successful!");
+                clearCart();
+                navigate("/profile");
+            },
+            theme: { color: "#1F2B5B" }
+        };
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+
+    } catch (e: any) {
+        // Log the actual error to understand why it failed
+        console.error("Order process error:", e);
+        toast.error(e?.error || "Order process failed");
+    } finally {
+        setIsPlacingOrder(false);
+    }
+};
   if (items.length === 0) {
-    return (
-      <div className="container mx-auto px-6 py-24 text-center">
-        <h1 className="font-display font-extrabold text-2xl text-foreground">Your cart is empty</h1>
-        <Link to="/products" className="text-primary font-semibold mt-4 inline-block">← Continue Shopping</Link>
-      </div>
-    );
+    return <div className="text-center py-24">Cart is empty. <Link to="/products" className="text-primary font-bold">Shop now</Link></div>;
   }
 
-  const shipping = 0;
-  const total = totalPrice + shipping;
-
   return (
-    <div className="bg-surface min-h-screen">
-      <div className="container mx-auto px-6 py-8">
-        <Link to="/products" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors mb-8">
-          <ArrowLeft className="w-4 h-4" /> Continue Shopping
-        </Link>
-
-        <h1 className="font-display font-extrabold text-3xl text-foreground tracking-tight mb-10">Checkout</h1>
-
-        <form onSubmit={handleSubmit} className="grid lg:grid-cols-3 gap-10">
-          {/* Left: Shipping */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-card rounded-2xl p-8 shadow-ambient">
-              <h2 className="font-display font-bold text-lg text-foreground mb-6">Shipping Details</h2>
-              <div className="grid sm:grid-cols-2 gap-4">
-                {[
-                  { name: "name", label: "Full Name", span: 2 },
-                  { name: "email", label: "Email Address" },
-                  { name: "phone", label: "Phone Number" },
-                  { name: "address", label: "Address", span: 2 },
-                  { name: "city", label: "City" },
-                  { name: "state", label: "State" },
-                  { name: "pincode", label: "Pincode" },
-                ].map((field) => (
-                  <div key={field.name} className={field.span === 2 ? "sm:col-span-2" : ""}>
-                    <label className="text-xs font-display font-semibold text-muted-foreground uppercase tracking-wider block mb-1.5">{field.label}</label>
-                    <input
-                      name={field.name}
-                      value={form[field.name as keyof typeof form]}
-                      onChange={handleChange}
-                      required
-                      className="w-full bg-input rounded-xl px-4 py-3 text-sm text-foreground font-body focus:bg-card focus:ring-2 focus:ring-primary/30 outline-none transition-all"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="bg-card rounded-2xl p-8 shadow-ambient">
-              <h2 className="font-display font-bold text-lg text-foreground mb-4">Payment</h2>
-              <p className="text-muted-foreground text-sm">Our team will contact you to arrange payment via UPI, bank transfer, or EMI after order confirmation.</p>
-              <div className="flex items-center gap-2 mt-4 text-success">
-                <ShieldCheck className="w-4 h-4" />
-                <span className="text-sm font-semibold">Secure & encrypted checkout</span>
-              </div>
+    <div className="container mx-auto px-6 py-8">
+      <h1 className="text-3xl font-bold mb-8">Checkout</h1>
+      <div className="grid lg:grid-cols-3 gap-10">
+        
+        <div className="lg:col-span-2 space-y-6">
+          <AddressManager onSelect={setSelectedAddress} />
+          
+          <div className="bg-card p-6 rounded-xl border">
+            <h2 className="font-bold mb-4">Payment Method</h2>
+            <div className="flex gap-4">
+              {['Online', 'COD'].map((method) => (
+                <button key={method} onClick={() => setPaymentMethod(method as any)}
+                  className={`p-4 border rounded-lg ${paymentMethod === method ? "border-primary bg-primary/10" : ""}`}>
+                  {method}
+                </button>
+              ))}
             </div>
           </div>
+        </div>
 
-          {/* Right: Order Summary */}
-          <div>
-            <div className="bg-card rounded-2xl p-6 shadow-ambient sticky top-24">
-              <h2 className="font-display font-bold text-lg text-foreground mb-6">Order Summary</h2>
-              <div className="space-y-4 mb-6">
-                {items.map(({ product, quantity }) => (
-                  <div key={product.id} className="flex gap-3">
-                    <img src={product.image} alt={product.name} className="w-14 h-14 object-contain rounded-lg bg-surface-low" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-display font-semibold text-foreground truncate">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">Qty: {quantity}</p>
-                    </div>
-                    <p className="text-sm font-display font-bold text-foreground whitespace-nowrap">₹{(product.price * quantity).toLocaleString("en-IN")}</p>
-                  </div>
-                ))}
-              </div>
-              <div className="border-t border-border/30 pt-4 space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal</span>
-                  <span className="text-foreground font-semibold">₹{totalPrice.toLocaleString("en-IN")}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span className="text-success font-semibold">FREE</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-border/30">
-                  <span className="font-display font-bold text-foreground">Total</span>
-                  <span className="font-display font-extrabold text-xl text-foreground">₹{total.toLocaleString("en-IN")}</span>
-                </div>
-              </div>
-              <button type="submit" className="w-full gradient-primary text-primary-foreground py-4 rounded-xl font-display font-semibold text-sm hover:opacity-90 transition-opacity mt-6">
-                Place Order
-              </button>
+        {/* Summary */}
+        <div className="lg:col-span-1">
+          <div className="bg-card p-6 rounded-xl border shadow-sm sticky top-24">
+            <h2 className="font-bold mb-4">Summary</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between"><span>Subtotal</span><span>₹{calculations.subtotal}</span></div>
+              {paymentMethod === 'COD' && <div className="flex justify-between"><span>COD Fee (2%)</span><span>₹{calculations.codFee.toFixed(2)}</span></div>}
+              <div className="flex justify-between font-bold pt-2 border-t"><span>Total</span><span>₹{calculations.total.toFixed(2)}</span></div>
             </div>
+            <button onClick={handlePlaceOrder} disabled={isPlacingOrder} className="w-full bg-primary text-white py-3 mt-6 rounded-lg font-bold">
+              {isPlacingOrder ? <Loader2 className="animate-spin mx-auto" /> : "Place Order"}
+            </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

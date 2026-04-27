@@ -32,22 +32,22 @@ const CartDrawer = () => {
               <p className="text-muted-foreground text-sm mt-1">Add some products to get started.</p>
             </div>
           ) : (
-            items.map(({ product, quantity }) => (
-              <div key={product.id} className="flex gap-4 bg-surface-low rounded-xl p-3">
-                <img src={product.image} alt={product.name} className="w-20 h-20 object-contain rounded-lg bg-card" />
+            items.map((item) => (
+              <div key={item.id} className="flex gap-4 bg-surface-low rounded-xl p-3">
+                <img src={item.image} alt={item.name} className="w-20 h-20 object-contain rounded-lg bg-card" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider">{product.brand}</p>
-                  <p className="font-display font-semibold text-sm text-foreground truncate">{product.name}</p>
-                  <p className="font-display font-extrabold text-foreground mt-1">₹{product.price.toLocaleString("en-IN")}</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wider">{item.variant || "Standard"}</p>
+                  <p className="font-display font-semibold text-sm text-foreground truncate">{item.name}</p>
+                  <p className="font-display font-extrabold text-foreground mt-1">₹{item.price.toLocaleString("en-IN")}</p>
                   <div className="flex items-center gap-2 mt-2">
-                    <button onClick={() => updateQuantity(product.id, quantity - 1)} className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-secondary-foreground hover:bg-secondary/80">
+                    <button onClick={() => updateQuantity(item.id, item.quantity - 1)} className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-secondary-foreground hover:bg-secondary/80">
                       <Minus className="w-3 h-3" />
                     </button>
-                    <span className="text-sm font-semibold w-6 text-center">{quantity}</span>
-                    <button onClick={() => updateQuantity(product.id, quantity + 1)} className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-secondary-foreground hover:bg-secondary/80">
+                    <span className="text-sm font-semibold w-6 text-center">{item.quantity}</span>
+                    <button onClick={() => updateQuantity(item.id, item.quantity + 1)} className="w-7 h-7 rounded-md bg-secondary flex items-center justify-center text-secondary-foreground hover:bg-secondary/80">
                       <Plus className="w-3 h-3" />
                     </button>
-                    <button onClick={() => removeFromCart(product.id)} className="ml-auto p-1.5 text-destructive/60 hover:text-destructive transition-colors">
+                    <button onClick={() => removeFromCart(item.id)} className="ml-auto p-1.5 text-destructive/60 hover:text-destructive transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>

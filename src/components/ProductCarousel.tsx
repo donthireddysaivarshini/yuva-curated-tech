@@ -1,28 +1,35 @@
 import { useRef } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import type { Product } from "@/data/mockData";
 import ProductCard from "./ProductCard";
 
+// 'any' is used here to safely accept the API response structure 
+// that contains nested images, variants, and usage_tags arrays.
 interface ProductCarouselProps {
-  products: Product[];
+  products: any[]; 
+  title?: string;
 }
 
-const ProductCarousel = ({ products }: ProductCarouselProps) => {
+const ProductCarousel = ({ products, title }: ProductCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: "left" | "right") => {
     if (!scrollRef.current) return;
     const amount = scrollRef.current.offsetWidth * 0.75;
-    scrollRef.current.scrollBy({ left: dir === "left" ? -amount : amount, behavior: "smooth" });
+    scrollRef.current.scrollBy({ 
+      left: dir === "left" ? -amount : amount, 
+      behavior: "smooth" 
+    });
   };
 
+  if (!products || products.length === 0) return null;
+
   return (
-    // FIX: Added w-full to make sure it respects the parent's width constraints
     <div className="relative group/carousel w-full">
+      {title && <h2 className="font-display font-extrabold text-2xl md:text-3xl mb-8">{title}</h2>}
+      
       <button
         onClick={() => scroll("left")}
-        // FIX: Changed `flex` to `hidden md:flex`. This hides the button on mobile so `-left-4` doesn't break the screen width!
-        className="flex absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-colors opacity-100 md:opacity-0 group-hover/carousel:opacity-100"
+        className="hidden md:flex absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-opacity opacity-0 group-hover/carousel:opacity-100"
       >
         <ChevronLeft className="w-5 h-5" />
       </button>
@@ -33,6 +40,7 @@ const ProductCarousel = ({ products }: ProductCarouselProps) => {
       >
         {products.map((p) => (
           <div key={p.id} className="w-[260px] shrink-0">
+            {/* The 'p' object passed here matches the structure of your ProductListSerializer */}
             <ProductCard product={p} />
           </div>
         ))}
@@ -40,8 +48,7 @@ const ProductCarousel = ({ products }: ProductCarouselProps) => {
 
       <button
         onClick={() => scroll("right")}
-        // FIX: Changed `flex` to `hidden md:flex`. Hide on mobile so `-right-4` doesn't stretch the screen!
-        className="flex absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-colors opacity-100 md:opacity-0 group-hover/carousel:opacity-100"
+        className="hidden md:flex absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-card shadow-lg border border-border/30 items-center justify-center text-foreground hover:bg-muted transition-opacity opacity-0 group-hover/carousel:opacity-100"
       >
         <ChevronRight className="w-5 h-5" />
       </button>

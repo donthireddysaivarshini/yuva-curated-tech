@@ -1,7 +1,9 @@
+//yuva computers
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { authService } from '@/services/api';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface Address {
   id: number;
@@ -128,23 +130,37 @@ export default function ProfilePage() {
   };
 
   const handleAddressSave = async () => {
-    setAddressSaving(true);
-    setAddressMsg('');
-    try {
-      const payload = editingAddress
-        ? { ...addressForm, id: editingAddress.id }
-        : addressForm;
-      await authService.saveAddress(payload);
-      await loadAddresses();
-      setShowAddressForm(false);
-      setAddressMsg('Address saved!');
-    } catch (err: any) {
-      setAddressMsg(err?.non_field_errors?.[0] || 'Failed to save address.');
-    } finally {
-      setAddressSaving(false);
-      setTimeout(() => setAddressMsg(''), 3000);
+    // 1. Basic validation
+    if (!addressForm.first_name || !addressForm.address || !addressForm.zip_code) {
+        toast.error("Please fill in required fields (Name, Address, ZIP).");
+        return;
     }
-  };
+
+    setAddressSaving(true);
+    try {
+        // 2. Prepare payload
+        const payload = {
+            ...addressForm,
+            // Ensure ID is passed if editing
+            ...(editingAddress? { id: editingAddress.id} : {})
+        };
+
+        // 3. Call Service
+        await authService.saveAddress(payload);
+        
+        // 4. Refresh List & Reset UI
+        await loadAddresses();
+        setShowAddressForm(false);
+        setEditingAddress(null);
+        toast.success("Address saved successfully!");
+    } catch (err: any) {
+        console.error("Save Address Error:", err);
+        // Show specific backend error if available
+        toast.error(err?.non_field_errors?.[0] || "Failed to save address. Check your inputs.");
+    } finally {
+        setAddressSaving(false);
+    }
+};
 
   const handleDeleteAddress = async (id: number) => {
     if (!confirm('Delete this address?')) return;

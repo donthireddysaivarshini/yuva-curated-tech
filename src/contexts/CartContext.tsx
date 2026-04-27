@@ -1,16 +1,21 @@
 import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
-import type { Product } from "@/data/mockData";
 
 interface CartItem {
-  product: Product;
+  id: string;
+  name: string;
+  price: number;
+  image: string;
   quantity: number;
+  stock: number;
+  variant?: string;
+  productId: number;
 }
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: any, quantity: number, variant?: any) => boolean;
+  removeFromCart: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
@@ -24,35 +29,44 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  const addToCart = useCallback((product: Product) => {
+  const addToCart = useCallback((product: any, quantity: number, variant?: any) => {
+    const id = variant ? `${product.id}-${variant.ram}-${variant.storage}` : String(product.id);
+    const stock = variant ? variant.stock : (product.stock || 0);
+    const price = variant?.final_price ?? Number(product.price);
+    const image = product.images?.find((i: any) => i.is_primary)?.image || product.images?.[0]?.image || "";
+
+    let success = false;
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
-      if (existing) {
-        return prev.map((i) => i.product.id === product.id ? { ...i, quantity: i.quantity + 1 } : i);
+      const existing = prev.find((item) => item.id === id);
+      const currentQty = existing ? existing.quantity : 0;
+
+      if (currentQty + quantity <= stock) {
+        success = true;
+        if (existing) {
+          return prev.map((item) => item.id === id ? { ...item, quantity: item.quantity + quantity } : item);
+        }
+        return [...prev, { id, productId: product.id, name: product.title, price, image, quantity, stock, variant: variant ? `${variant.ram} / ${variant.storage}` : undefined }];
       }
-      return [...prev, { product, quantity: 1 }];
+      return prev;
+    });
+    return success;
+  }, []);
+
+  const updateQuantity = useCallback((id: string, quantity: number) => {
+    setItems((prev) => {
+      const item = prev.find((i) => i.id === id);
+      if (!item) return prev;
+      if (quantity > item.stock) return prev;
+      if (quantity <= 0) return prev.filter((i) => i.id !== id);
+      return prev.map((i) => (i.id === id ? { ...i, quantity } : i));
     });
   }, []);
 
-  const removeFromCart = useCallback((productId: string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
-  }, []);
-
-  const updateQuantity = useCallback((productId: string, quantity: number) => {
-    if (quantity <= 0) {
-      setItems((prev) => prev.filter((i) => i.product.id !== productId));
-    } else {
-      setItems((prev) => prev.map((i) => i.product.id === productId ? { ...i, quantity } : i));
-    }
-  }, []);
-
+  const removeFromCart = useCallback((id: string) => setItems((prev) => prev.filter((i) => i.id !== id)), []);
   const clearCart = useCallback(() => setItems([]), []);
 
-  const totalItems = items.reduce((sum, i) => sum + i.quantity, 0);
-  const totalPrice = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0);
-
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems, totalPrice, isDrawerOpen, setDrawerOpen }}>
+    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems: items.reduce((s, i) => s + i.quantity, 0), totalPrice: items.reduce((s, i) => s + i.price * i.quantity, 0), isDrawerOpen, setDrawerOpen }}>
       {children}
     </CartContext.Provider>
   );
