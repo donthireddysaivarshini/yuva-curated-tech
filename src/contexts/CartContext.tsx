@@ -8,6 +8,7 @@ interface CartItem {
   quantity: number;
   stock: number;
   variant?: string;
+  variantId?: number;  
   productId: number;
 }
 
@@ -45,7 +46,20 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
         if (existing) {
           return prev.map((item) => item.id === id ? { ...item, quantity: item.quantity + quantity } : item);
         }
-        return [...prev, { id, productId: product.id, name: product.title, price, image, quantity, stock, variant: variant ? `${variant.ram} / ${variant.storage}` : undefined }];
+        return [
+  ...prev,
+  {
+    id,
+    productId: product.id,
+    name: product.title,
+    price,
+    image,
+    quantity,
+    stock,
+    variant: variant ? `${variant.ram} / ${variant.storage}` : undefined,
+    variantId: variant?.id || null,   // ✅ ADD THIS
+  }
+];
       }
       return prev;
     });

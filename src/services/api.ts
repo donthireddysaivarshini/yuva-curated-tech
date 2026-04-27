@@ -160,8 +160,14 @@ export const orderService = {
   getUserOrders: async (page = 1) =>
     (await api.get(`/orders/?page=${page}`)).data,
 
-  verifyPayment: async (paymentData: any) => 
-    (await api.post('/payments/verify/', paymentData)).data,
+  getOrderDetail: async (id: number) =>
+    (await api.get(`/orders/${id}/`)).data,
+
+  verifyPayment: async (paymentData: {
+    razorpay_order_id: string;
+    razorpay_payment_id: string;
+    razorpay_signature: string;
+  }) => (await api.post('/payments/verify/', paymentData)).data,
 };
 
 // ─── CONTENT ─────────────────────────────────────────────────────────────────
