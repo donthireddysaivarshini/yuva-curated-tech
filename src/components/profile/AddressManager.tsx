@@ -47,7 +47,7 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
   const [editing, setEditing] = useState<Address | null>(null);
   const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
-
+  const [deletingId, setDeletingId] = useState<number | null>(null);
   const isCheckoutMode = !!onSelect;
 
   useEffect(() => { load(); }, []);
@@ -109,14 +109,17 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Delete this address?')) return;
-    try {
-      await authService.deleteAddress(id);
-      await load();
-      toast.success('Address removed');
-    } catch { toast.error('Failed to delete'); }
-  };
-
+  // REMOVE: if (!confirm('Delete this address?')) return;
+  
+  // OPTION A: Delete immediately
+  try {
+    await authService.deleteAddress(id);
+    await load();
+    toast.success('Address removed');
+  } catch { 
+    toast.error('Failed to delete'); 
+  }
+};
   const handleSetDefault = async (id: number) => {
     try {
       await authService.setDefaultAddress(id);
@@ -217,11 +220,25 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
                   <Edit2 className="w-3 h-3" /> Edit
                 </button>
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleDelete(addr.id); }}
-                  className="flex items-center gap-1 text-xs text-destructive hover:underline font-medium"
-                >
-                  <Trash2 className="w-3 h-3" /> Delete
-                </button>
+                    onClick={(e) => { 
+                      e.stopPropagation(); 
+                      // Logic: If user clicks once, show "Confirm?". If clicked again, delete.
+                      if (deletingId === addr.id) {
+                          handleDelete(addr.id);
+                          setDeletingId(null);
+                      } else {
+                          setDeletingId(addr.id);
+                          // Optional: auto-reset after 3 seconds
+                          setTimeout(() => setDeletingId(null), 3000);
+                      }
+                    }}
+                    className={`flex items-center gap-1 text-xs font-medium hover:underline ${
+                      deletingId === addr.id ? 'text-destructive font-bold' : 'text-destructive'
+                    }`}
+                  >
+                    <Trash2 className="w-3 h-3" /> 
+                    {deletingId === addr.id ? 'Confirm?' : 'Delete'}
+                  </button>
                 {!addr.is_default && (
                   <button
                     onClick={(e) => { e.stopPropagation(); handleSetDefault(addr.id); }}

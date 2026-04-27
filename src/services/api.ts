@@ -168,6 +168,17 @@ export const orderService = {
     razorpay_payment_id: string;
     razorpay_signature: string;
   }) => (await api.post('/payments/verify/', paymentData)).data,
+
+  submitReturnRequest: async (orderId: number, data: {
+    request_type: string;
+    defect_description: string;
+    defect_video_url?: string;
+  }) => (await api.post(`/orders/${orderId}/return/`, data)).data,
+
+  validateExchangeCode: async (code: string) =>
+    (await api.post('/orders/validate-exchange-code/', { code })).data,
+  cancelOrder: async (orderId: number) =>
+  (await api.post(`/orders/${orderId}/cancel/`)).data,
 };
 
 // ─── CONTENT ─────────────────────────────────────────────────────────────────
