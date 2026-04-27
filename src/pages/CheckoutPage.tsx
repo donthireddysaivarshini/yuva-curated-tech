@@ -7,14 +7,15 @@ import { orderService, storeService } from "@/services/api";
 import { toast } from "sonner";
 import AddressManager from "@/components/profile/AddressManager";
 
+
 export default function CheckoutPage() {
   const { items, totalPrice, clearCart } = useCart();
   const { isLoggedIn } = useAuth();
   const navigate = useNavigate();
-
+  const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [selectedAddress, setSelectedAddress] = useState<any>(null);
   const [paymentMethod, setPaymentMethod] = useState<'Online' | 'COD'>('Online');
-
+  const [hasAddresses, setHasAddresses] = useState<boolean | null>(null);
   // Coupon
   const [couponCode, setCouponCode] = useState('');
   const [couponApplied, setCouponApplied] = useState<{ code: string; discount: number } | null>(null);
@@ -89,11 +90,24 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    if (!selectedAddress) { toast.error('Please select a shipping address'); return; }
-    if (items.length === 0) { toast.error('Your cart is empty'); return; }
-    if (!acceptedPolicy) { toast.error('Please accept the return & exchange policy'); return; }
+  setCheckoutError(null);
 
-    setIsPlacingOrder(true);
+  if (!selectedAddress) {
+  setCheckoutError("Please add or select a shipping address to continue");
+  return;
+}
+
+  if (!acceptedPolicy) {
+    setCheckoutError("Please accept return & exchange policy");
+    return;
+  }
+
+  if (items.length === 0) {
+    setCheckoutError("Your cart is empty");
+    return;
+  }
+
+  setIsPlacingOrder(true);
     try {
       const orderPayload = {
         items: items.map(item => ({
@@ -364,11 +378,16 @@ export default function CheckoutPage() {
                   <span className="text-xs text-foreground font-medium leading-relaxed">I accept the return & exchange policy</span>
                 </label>
               </div>
+              {checkoutError && (
+  <div className="mb-3 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm font-medium">
+    {checkoutError}
+  </div>
+)}
 
               {/* Place Order Button */}
               <button
                 onClick={handlePlaceOrder}
-                disabled={isPlacingOrder || !selectedAddress || !acceptedPolicy}
+                disabled={isPlacingOrder}
                 className="w-full gradient-primary text-primary-foreground py-4 rounded-xl font-display font-bold text-sm uppercase tracking-widest hover:opacity-90 disabled:opacity-50 transition flex items-center justify-center gap-2"
               >
                 {isPlacingOrder

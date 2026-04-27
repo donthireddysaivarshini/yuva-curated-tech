@@ -1,6 +1,34 @@
 //yuva
 import axios from 'axios';
 
+export interface BulkOrderPayload {
+  name: string;
+  company: string;
+  email: string;
+  phone: string;          // sent as 10-digit string (no +91 prefix)
+  device_type: string;
+  quantity: number;
+  requirements?: string;
+}
+ 
+export interface ContactPayload {
+  name: string;
+  email: string;
+  phone: string;
+  order_id?: string;
+  issue_type: string;
+  message: string;
+}
+ 
+export interface ComplaintPayload {
+  name: string;
+  order_id: string;
+  issue_type: string;
+  email: string;
+  phone: string;
+  description: string;
+}
+
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api',
   headers: {
@@ -36,6 +64,15 @@ api.interceptors.response.use(
     return Promise.reject(error.response?.data || error);
   }
 );
+
+export const submitBulkOrder = (data: BulkOrderPayload) =>
+  api.post<{ detail: string }>("/forms/bulk-order/", data);
+ 
+export const submitContactForm = (data: ContactPayload) =>
+  api.post<{ detail: string }>("/forms/contact/", data);
+ 
+export const submitComplaint = (data: ComplaintPayload) =>
+  api.post<{ detail: string }>("/forms/complaint/", data);
 
 // ─── AUTH ────────────────────────────────────────────────────────────────────
 export const authService = {
@@ -183,7 +220,20 @@ export const orderService = {
 
 // ─── CONTENT ─────────────────────────────────────────────────────────────────
 export const contentService = {
-  getWebContent: async () => (await api.get('/content/')).data,
+  getHomeContent: async () =>
+    (await api.get('/content/home/')).data,
+
+  getCompanyContent: async () =>
+    (await api.get('/content/company/')).data,
+
+  getBulkOrderContent: async () =>
+    (await api.get('/content/bulk-orders/')).data,
+
+  getStoresContent: async () =>
+    (await api.get('/content/stores/')).data,
+
+  getContactContent: async () =>
+    (await api.get('/content/contact/')).data,
 };
 
 // ─── CONTACT ─────────────────────────────────────────────────────────────────

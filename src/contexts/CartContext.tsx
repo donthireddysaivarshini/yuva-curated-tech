@@ -1,4 +1,11 @@
-import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+  type ReactNode
+} from "react";
 
 interface CartItem {
   id: string;
@@ -8,7 +15,7 @@ interface CartItem {
   quantity: number;
   stock: number;
   variant?: string;
-  variantId?: number;  
+  variantId?: number;
   productId: number;
 }
 
@@ -26,43 +33,79 @@ interface CartContextType {
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
+const CART_KEY = "cart";
+
 export const CartProvider = ({ children }: { children: ReactNode }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    if (typeof window === "undefined") return [];
+    try {
+      const stored = localStorage.getItem(CART_KEY);
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
+
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
+  // ✅ SAVE CART TO LOCAL STORAGE
+  useEffect(() => {
+    try {
+      localStorage.setItem(CART_KEY, JSON.stringify(items));
+    } catch (err) {
+      console.error("Failed to save cart:", err);
+    }
+  }, [items]);
+
   const addToCart = useCallback((product: any, quantity: number, variant?: any) => {
-    const id = variant ? `${product.id}-${variant.ram}-${variant.storage}` : String(product.id);
-    const stock = variant ? variant.stock : (product.stock || 0);
+    const id = variant
+      ? `${product.id}-${variant.ram}-${variant.storage}`
+      : String(product.id);
+
+    const stock = variant ? variant.stock : product.stock || 0;
     const price = variant?.final_price ?? Number(product.price);
-    const image = product.images?.find((i: any) => i.is_primary)?.image || product.images?.[0]?.image || "";
+
+    const image =
+      product.images?.find((i: any) => i.is_primary)?.image ||
+      product.images?.[0]?.image ||
+      "";
 
     let success = false;
+
     setItems((prev) => {
       const existing = prev.find((item) => item.id === id);
       const currentQty = existing ? existing.quantity : 0;
 
       if (currentQty + quantity <= stock) {
         success = true;
+
         if (existing) {
-          return prev.map((item) => item.id === id ? { ...item, quantity: item.quantity + quantity } : item);
+          return prev.map((item) =>
+            item.id === id
+              ? { ...item, quantity: item.quantity + quantity }
+              : item
+          );
         }
+
         return [
-  ...prev,
-  {
-    id,
-    productId: product.id,
-    name: product.title,
-    price,
-    image,
-    quantity,
-    stock,
-    variant: variant ? `${variant.ram} / ${variant.storage}` : undefined,
-    variantId: variant?.id || null,   // ✅ ADD THIS
-  }
-];
+          ...prev,
+          {
+            id,
+            productId: product.id,
+            name: product.title,
+            price,
+            image,
+            quantity,
+            stock,
+            variant: variant ? `${variant.ram} / ${variant.storage}` : undefined,
+            variantId: variant?.id || null
+          }
+        ];
       }
+
       return prev;
     });
+
     return success;
   }, []);
 
@@ -72,15 +115,34 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (!item) return prev;
       if (quantity > item.stock) return prev;
       if (quantity <= 0) return prev.filter((i) => i.id !== id);
-      return prev.map((i) => (i.id === id ? { ...i, quantity } : i));
+
+      return prev.map((i) =>
+        i.id === id ? { ...i, quantity } : i
+      );
     });
   }, []);
 
-  const removeFromCart = useCallback((id: string) => setItems((prev) => prev.filter((i) => i.id !== id)), []);
+  const removeFromCart = useCallback(
+    (id: string) => setItems((prev) => prev.filter((i) => i.id !== id)),
+    []
+  );
+
   const clearCart = useCallback(() => setItems([]), []);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, totalItems: items.reduce((s, i) => s + i.quantity, 0), totalPrice: items.reduce((s, i) => s + i.price * i.quantity, 0), isDrawerOpen, setDrawerOpen }}>
+    <CartContext.Provider
+      value={{
+        items,
+        addToCart,
+        removeFromCart,
+        updateQuantity,
+        clearCart,
+        totalItems: items.reduce((s, i) => s + i.quantity, 0),
+        totalPrice: items.reduce((s, i) => s + i.price * i.quantity, 0),
+        isDrawerOpen,
+        setDrawerOpen
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

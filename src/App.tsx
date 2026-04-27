@@ -18,7 +18,8 @@ import StoresPage from "@/pages/StoresPage";
 import ContactPage from "@/pages/ContactPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import NotFound from "@/pages/NotFound";
-
+import StateStoresPage from "@/pages/StateStoresPage";
+import ScrollToTop from "./components/ScrolltoTop";
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -30,6 +31,7 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <CartDrawer />
+           <ScrollToTop />
           <Routes>
             <Route element={<Layout />}>
               
@@ -38,7 +40,9 @@ const App = () => (
               <Route path="/product/:slug" element={<ProductDetailPage />} />
               <Route path="/bulk-orders" element={<BulkOrdersPage />} />
               <Route path="/company" element={<CompanyPage />} />
+              
               <Route path="/stores" element={<StoresPage />} />
+              <Route path="/stores/:state" element={<StateStoresPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
 

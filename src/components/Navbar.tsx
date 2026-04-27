@@ -23,6 +23,7 @@ interface SearchResult {
 }
 
 const Navbar = () => {
+  const [profileOpen, setProfileOpen] = useState(false);
   const { isLoggedIn, user, logout } = useAuth();
   const [megaOpen, setMegaOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -58,6 +59,7 @@ const Navbar = () => {
     };
     fetchMenuData();
   }, []);
+  
 
   useEffect(() => {
     const timeoutId = setTimeout(async () => {
@@ -105,7 +107,7 @@ const Navbar = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 glass-nav border-b border-border/30 relative bg-white">
+      <header className="fixed top-0 left-0 right-0 z-50 w-full bg-background border-b border-border">
         <div className="container mx-auto px-4 md:px-6 flex items-center justify-between h-20 md:h-24">
           <div className="flex items-center gap-1 shrink-0">
             <button onClick={() => setMobileOpen(!mobileOpen)} className="lg:hidden p-1 text-foreground -ml-1 mr-1 hover:bg-muted rounded">
@@ -135,13 +137,41 @@ const Navbar = () => {
               {totalItems > 0 && <span className="absolute -top-1 -right-1 text-xs bg-black text-white px-1 rounded">{totalItems}</span>}
             </button>
             {isLoggedIn ? (
-              <div className="relative group">
-                <button className="flex items-center gap-1 p-2 hover:bg-muted rounded-lg"><User size={20}/></button>
-                <div className="absolute right-0 top-full mt-2 w-40 bg-white border shadow-xl rounded-lg p-2 hidden group-hover:block z-50">
-                  <button onClick={() => navigate("/profile")} className="block w-full p-2 text-sm text-left hover:bg-muted"><Package size={16} className="inline mr-2"/> Profile</button>
-                  <button onClick={() => { logout(); navigate("/"); }} className="block w-full p-2 text-sm text-red-600 text-left hover:bg-muted"><LogOut size={16} className="inline mr-2"/> Logout</button>
-                </div>
-              </div>
+              <div className="relative">
+  <button
+    onClick={() => setProfileOpen((prev) => !prev)}
+    className="flex items-center gap-1 p-2 hover:bg-muted rounded-lg"
+  >
+    <User size={20} />
+  </button>
+
+  {profileOpen && (
+    <div className="absolute right-0 top-full mt-2 w-40 bg-white border shadow-xl rounded-lg p-2 z-50">
+      <button
+        onClick={() => {
+          setProfileOpen(false);
+          navigate("/profile");
+        }}
+        className="block w-full p-2 text-sm text-left hover:bg-muted"
+      >
+        <Package size={16} className="inline mr-2" />
+        Profile
+      </button>
+
+      <button
+        onClick={() => {
+          logout();
+          setProfileOpen(false);
+          navigate("/");
+        }}
+        className="block w-full p-2 text-sm text-red-600 text-left hover:bg-muted"
+      >
+        <LogOut size={16} className="inline mr-2" />
+        Logout
+      </button>
+    </div>
+  )}
+</div>
             ) : <button onClick={() => navigate("/login")} className="p-2 hover:bg-muted rounded-lg"><User size={20}/></button>}
           </div>
         </div>

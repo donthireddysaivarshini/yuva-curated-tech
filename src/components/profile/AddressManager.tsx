@@ -66,6 +66,15 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
     } catch { setAddresses([]); }
     finally { setLoading(false); }
   };
+  useEffect(() => {
+  if (!onSelect) return;
+  if (addresses.length === 0) return;
+
+  const defaultAddr = addresses.find(a => a.is_default) || addresses[0];
+
+   // optional (if you track it locally)
+  onSelect(defaultAddr);
+}, [addresses]);
 
   const openNew = () => {
     setEditing(null);
@@ -151,9 +160,25 @@ export default function AddressManager({ onSelect, selectedId }: Props) {
 
       {/* Address Cards */}
       {addresses.length === 0 && !showForm && (
-        <p className="text-sm text-muted-foreground">No saved addresses yet.</p>
-      )}
+  <div className="text-center py-6 space-y-3">
+    <MapPin className="w-6 h-6 mx-auto text-muted-foreground" />
 
+    <p className="text-sm text-muted-foreground">
+      No saved address found
+    </p>
+
+    <p className="text-xs text-muted-foreground">
+      Please add a shipping address to continue checkout
+    </p>
+
+    <button
+      onClick={openNew}
+      className="gradient-primary text-white px-4 py-2 rounded-lg text-sm font-bold"
+    >
+      Add Shipping Address
+    </button>
+  </div>
+)}
       <div className="space-y-3">
         {addresses.map((addr) => {
           const isSelected = isCheckoutMode

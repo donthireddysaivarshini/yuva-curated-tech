@@ -1,20 +1,47 @@
-// src/components/home/HeroSection.tsx
 import { useState, useEffect } from "react";
 
-const heroSlides = ["/hero1.png", "/hero2.png", "/hero3.png"];
+const FALLBACK_SLIDES = ["/hero1.png", "/hero2.png", "/hero3.png"];
 
-export const HeroSection = () => {
+interface Props {
+  slides?: { id: number; image: string }[];
+}
+
+export const HeroSection = ({ slides }: Props) => {
   const [current, setCurrent] = useState(0);
+
+  const images = slides && slides.length > 0
+    ? slides.map(s => s.image)
+    : FALLBACK_SLIDES;
+
   useEffect(() => {
-    const timer = setInterval(() => setCurrent((c) => (c + 1) % heroSlides.length), 5000);
+    const timer = setInterval(() => setCurrent(c => (c + 1) % images.length), 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [images.length]);
 
   return (
     <section className="relative w-full h-[400px] overflow-hidden">
-      {heroSlides.map((src, i) => (
-        <img key={i} src={src} className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${i === current ? "opacity-100" : "opacity-0"}`} />
+      {images.map((src, i) => (
+        <img
+          key={i}
+          src={src}
+          alt=""
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${
+            i === current ? "opacity-100" : "opacity-0"
+          }`}
+        />
       ))}
+      {/* Dot indicators */}
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+        {images.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrent(i)}
+            className={`w-2 h-2 rounded-full transition-all ${
+              i === current ? "bg-white scale-125" : "bg-white/50"
+            }`}
+          />
+        ))}
+      </div>
     </section>
   );
 };
