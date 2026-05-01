@@ -74,6 +74,7 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
 
         {/* REVIEWS SECTION: Only renders if hasReviews is true */}
       
+{/* REVIEWS SECTION: Only renders if count is > 0 */}
 {product.review_count > 0 && (
   <div className="flex items-center gap-1 mt-1 mb-2">
     <div className="flex text-yellow-400">

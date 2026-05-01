@@ -191,10 +191,12 @@ export default function CheckoutPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 md:px-6 py-8">
+      {/* px-4 provides necessary gutters on mobile so content doesn't hit the screen edges */}
+      <div className="container mx-auto px-4 md:px-6 py-4 md:py-8">
         <h1 className="font-display font-extrabold text-2xl md:text-3xl text-foreground mb-8">Checkout</h1>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        {/* grid-cols-1 by default (mobile), lg:grid-cols-3 for desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* LEFT */}
           <div className="lg:col-span-2 space-y-6">
             {/* Address */}
@@ -211,7 +213,7 @@ export default function CheckoutPage() {
             {/* Payment Method */}
             <div className="bg-card rounded-2xl border border-border/30 p-6 space-y-4">
               <h3 className="font-display font-bold text-foreground">Payment Method</h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {(['Online', 'COD'] as const).map(method => (
                   <button
                     key={method}

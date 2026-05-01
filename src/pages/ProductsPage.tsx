@@ -1,8 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { Loader2, X, Filter, ChevronDown } from "lucide-react";
+import { Loader2, X, Filter } from "lucide-react";
 import { storeService } from "@/services/api";
-import ProductCard from "@/components/ProductCard";
+import HorizontalProductCard from "@/components/home/HorizontalProductCard";// Updated import[cite: 23]
 
 const ProductsPage = () => {
   const [searchParams] = useSearchParams();
@@ -124,18 +124,24 @@ const ProductsPage = () => {
         </aside>
 
         <main className="flex-1">
-          {loading ? <div className="flex justify-center py-20"><Loader2 className="animate-spin w-10 h-10" /></div> :
-            filteredAndSorted.length > 0 ? (
-              <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                {filteredAndSorted.map((p) => <ProductCard key={p.id} product={p} />)}
-              </div>
-            ) : (
-              <div className="py-20 text-center text-gray-500">No products found for these filters.</div>
-            )
-          }
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <Loader2 className="animate-spin w-10 h-10" />
+            </div>
+          ) : filteredAndSorted.length > 0 ? (
+            /* Updated Grid: Single column on mobile for horizontal cards[cite: 27] */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {filteredAndSorted.map((p) => (
+                <HorizontalProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          ) : (
+            <div className="py-20 text-center text-gray-500">No products found for these filters.</div>
+          )}
         </main>
       </div>
     </div>
   );
 };
+
 export default ProductsPage;

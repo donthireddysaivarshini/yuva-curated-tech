@@ -54,13 +54,25 @@ export default function ProductInfo({ product, onVariantChange }: { product: any
       <div>
         <h1 className="text-2xl md:text-3xl font-bold text-foreground tracking-tight">{product.title}</h1>
         
-        <div className="flex items-center gap-2 mt-1">
-          <div className="flex text-yellow-400">
-            {[...Array(5)].map((_, i) => <Star key={i} className="w-4 h-4 fill-current" />)}
-          </div>
-          <span className="font-semibold text-sm">{product.average_rating || 0}</span>
-          <span className="text-xs text-muted-foreground font-semibold">({product.review_count} Reviews)</span>
-        </div>
+        {/* Updated Rating Block in ProductInfo.tsx */}
+{product.review_count > 0 && (
+  <div className="flex items-center gap-2 mt-1">
+    <div className="flex text-yellow-400">
+      {[...Array(5)].map((_, i) => (
+        <Star 
+          key={i} 
+          className={`w-4 h-4 ${
+            i < Math.floor(product.average_rating || 0) 
+              ? "fill-current" 
+              : "text-gray-300 fill-none"
+          }`} 
+        />
+      ))}
+    </div>
+    <span className="font-semibold text-sm">{product.average_rating || 0}</span>
+    <span className="text-xs text-muted-foreground font-semibold">({product.review_count} Reviews)</span>
+  </div>
+)}
       </div>
       
       <div className="flex items-center gap-3">
