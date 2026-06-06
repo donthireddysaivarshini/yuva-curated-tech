@@ -1,26 +1,7 @@
+//horizontalproductcard
 import { Link } from "react-router-dom";
 import { Target, Star } from "lucide-react";
-
-interface ApiProduct {
-  id: number;
-  title: string;
-  slug: string;
-  sku: string;
-  price: string | number;
-  original_price?: string | number;
-  discount_percentage?: number;
-  condition: string;
-  condition_display?: string;
-  brand_name: string;
-  category_name: string;
-  processor?: string;
-  ram?: string;
-  storage?: string;
-  usage_tags?: { id: number; name: string; slug: string }[];
-  images?: { id: number; image: string; is_primary: boolean }[];
-  average_rating?: number;
-  review_count?: number;
-}
+import { type ApiProduct, getVariantSummary, getCardPrice } from "@/types/product";
 
 const conditionColors: Record<string, string> = {
   like_new: "bg-primary text-primary-foreground",
@@ -31,16 +12,28 @@ const conditionColors: Record<string, string> = {
 
 const HorizontalProductCard = ({ product }: { product: ApiProduct }) => {
   const primaryImage = product.images?.[0]?.image || "/placeholder.png";
-  const price = Number(product.price);
-  const originalPrice = product.original_price ? Number(product.original_price) : null;
-  const hasReviews = product.review_count && product.review_count > 0;
+
+  // ── Price: cheapest in-stock variant ────────────────────────────────────
+  const { price, originalPrice } = getCardPrice(product);
+
+  // ── Variant combination summary pills ───────────────────────────────────
+  // e.g. ["Core i7 | 16GB | 512GB", "Core i5 | 8GB | 256GB", "+2 more"]
+  // Derived purely from product.variants[] — no product-level specs used.
+  const variantSummary = getVariantSummary(product);
 
   return (
     <div className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-row md:flex-col h-full border border-border/40">
-      {/* LEFT SIDE: Image (Mobile: 1/3, Desktop: Full) */}
-      <Link to={`/product/${product.slug}`} className="w-1/3 md:w-full block border-r md:border-r-0 md:border-b border-border/10">
+      {/* LEFT: Image (mobile 1/3, desktop full) */}
+      <Link
+        to={`/product/${product.slug}`}
+        className="w-1/3 md:w-full block border-r md:border-r-0 md:border-b border-border/10"
+      >
         <div className="relative bg-surface-low flex items-center justify-center aspect-square overflow-hidden p-2 md:p-4">
-          <span className={`absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md text-[8px] md:text-[10px] font-display font-bold uppercase tracking-wider ${conditionColors[product.condition] || "bg-muted"}`}>
+          <span
+            className={`absolute top-2 left-2 z-10 px-2 py-0.5 rounded-md text-[8px] md:text-[10px] font-display font-bold uppercase tracking-wider ${
+              conditionColors[product.condition] || "bg-muted"
+            }`}
+          >
             {product.condition_display || product.condition}
           </span>
           <img
@@ -52,11 +45,11 @@ const HorizontalProductCard = ({ product }: { product: ApiProduct }) => {
         </div>
       </Link>
 
-      {/* RIGHT SIDE: Details */}
+      {/* RIGHT: Details */}
       <div className="p-3 md:p-4 flex flex-col flex-1">
         {product.usage_tags && product.usage_tags.length > 0 && (
           <div className="flex items-center gap-1 text-[8px] md:text-[10px] font-bold text-primary mb-1 md:mb-2 uppercase tracking-wider">
-            <Target className="w-2.5 h-2.5 md:w-3 h-3" />
+            <Target className="w-2.5 h-2.5 md:w-3 md:h-3" />
             {product.usage_tags[0].name}
           </div>
         )}
@@ -71,38 +64,65 @@ const HorizontalProductCard = ({ product }: { product: ApiProduct }) => {
           </h3>
         </Link>
 
-        {/* REVIEWS SECTION: Only renders if count is > 0 */}
-{product.review_count > 0 && (
-  <div className="flex items-center gap-1 mt-1 mb-1 md:mb-2">
-    <div className="flex text-yellow-400">
-      <Star className="w-2.5 h-2.5 md:w-3 h-3 fill-current" />
-    </div>
-    <span className="text-[10px] md:text-xs font-bold">{product.average_rating}</span>
-    <span className="text-[9px] md:text-[10px] text-muted-foreground">({product.review_count})</span>
-  </div>
-)}
+        {/* Reviews */}
+        {(product.review_count ?? 0) > 0 && (
+          <div className="flex items-center gap-1 mt-1 mb-1 md:mb-2">
+            <div className="flex text-yellow-400">
+              <Star className="w-2.5 h-2.5 md:w-3 md:h-3 fill-current" />
+            </div>
+            <span className="text-[10px] md:text-xs font-bold">{product.average_rating}</span>
+            <span className="text-[9px] md:text-[10px] text-muted-foreground">
+              ({product.review_count})
+            </span>
+          </div>
+        )}
 
-        {/* TECHNICAL SPECS */}
-        <div className="flex flex-wrap gap-1 md:gap-1.5 mt-1 md:mt-2">
-          {product.processor && <span className="text-[8px] md:text-[10px] bg-muted px-1.5 md:px-2 py-0.5 rounded">{product.processor}</span>}
-          {product.ram && <span className="text-[8px] md:text-[10px] bg-muted px-1.5 md:px-2 py-0.5 rounded">{product.ram}</span>}
-          {product.storage && <span className="text-[8px] md:text-[10px] bg-muted px-1.5 md:px-2 py-0.5 rounded">{product.storage}</span>}
-        </div>
+        {/*
+          Variant combination summary.
+          Each pill shows one full combination: "processor | ram | storage".
+          The last pill may be "+N more" when variants exceed MAX_SHOWN.
+          Only rendered when the product has variants — no product-level specs.
+        */}
+        {variantSummary.length > 0 && (
+          <div className="flex flex-wrap gap-1 md:gap-1.5 mt-1 md:mt-2">
+            {variantSummary.map((label) => (
+              <span
+                key={label}
+                className={`text-[8px] md:text-[10px] px-1.5 md:px-2 py-0.5 rounded font-medium ${
+                  label.startsWith("+")
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-auto pt-2 md:pt-4 flex flex-col md:flex-row md:items-end md:justify-between gap-2">
           <div>
-            <p className="font-display font-extrabold text-base md:text-lg text-foreground">₹{price.toLocaleString("en-IN")}</p>
+            <p className="font-display font-extrabold text-base md:text-lg text-foreground">
+              ₹{price.toLocaleString("en-IN")}
+            </p>
             <div className="flex items-center gap-2">
-                {originalPrice && originalPrice > price && (
-                <p className="text-[10px] md:text-xs text-muted-foreground line-through">₹{originalPrice.toLocaleString("en-IN")}</p>
-                )}
-                {product.discount_percentage && product.discount_percentage > 0 && (
-                    <span className="text-[9px] md:text-[10px] font-bold text-success">{product.discount_percentage}% OFF</span>
-                )}
+              {originalPrice && originalPrice > price && (
+                <p className="text-[10px] md:text-xs text-muted-foreground line-through">
+                  ₹{originalPrice.toLocaleString("en-IN")}
+                </p>
+              )}
+              {product.discount_percentage && product.discount_percentage > 0 && (
+                <span className="text-[9px] md:text-[10px] font-bold text-success">
+                  {product.discount_percentage}% OFF
+                </span>
+              )}
             </div>
           </div>
-          
-          <Link to={`/product/${product.slug}`} className="w-full md:w-auto text-center px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary text-primary-foreground text-[10px] md:text-xs font-bold hover:opacity-90 transition-opacity">
+
+          <Link
+            to={`/product/${product.slug}`}
+            className="w-full md:w-auto text-center px-3 py-1.5 md:px-4 md:py-2 rounded-lg bg-primary text-primary-foreground text-[10px] md:text-xs font-bold hover:opacity-90 transition-opacity"
+          >
             View Details
           </Link>
         </div>

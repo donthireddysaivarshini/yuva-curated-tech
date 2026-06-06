@@ -234,6 +234,13 @@ export const contentService = {
 
   getContactContent: async () =>
     (await api.get('/content/contact/')).data,
+  getBlogsContent: async (limit?: number) => {
+  const params = limit ? { limit } : {};
+  return (await api.get('/content/blogs/', { params })).data;
+},
+
+getBlogBySlug: async (slug: string) =>
+  (await api.get(`/content/blogs/${slug}/`)).data,
 };
 
 // ─── CONTACT ─────────────────────────────────────────────────────────────────

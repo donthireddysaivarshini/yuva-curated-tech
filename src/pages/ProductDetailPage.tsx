@@ -1,3 +1,4 @@
+//product detail page
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Loader2, FileText, CheckCircle } from "lucide-react"; // Added Icons

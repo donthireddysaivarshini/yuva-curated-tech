@@ -19,6 +19,7 @@ import ContactPage from "@/pages/ContactPage";
 import CheckoutPage from "@/pages/CheckoutPage";
 import NotFound from "@/pages/NotFound";
 import StateStoresPage from "@/pages/StateStoresPage";
+import BlogDetailPage from "./pages/BlogDetailPage";
 import ScrollToTop from "./components/ScrolltoTop";
 const queryClient = new QueryClient();
 
@@ -45,7 +46,7 @@ const App = () => (
               <Route path="/stores/:state" element={<StateStoresPage />} />
               <Route path="/contact" element={<ContactPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
-
+              <Route path="/blogs/:slug" element={<BlogDetailPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               

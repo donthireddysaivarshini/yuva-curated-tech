@@ -1,3 +1,4 @@
+//cartcontext
 import {
   createContext,
   useContext,
@@ -14,9 +15,13 @@ interface CartItem {
   image: string;
   quantity: number;
   stock: number;
-  variant?: string;
+  variant?: string;       // Display label: "i5 / 8GB / 256GB SSD"
   variantId?: number;
   productId: number;
+  // Individual variant fields stored for order payload / merging logic
+  processor?: string;
+  ram?: string;
+  storage?: string;
 }
 
 interface CartContextType {
@@ -48,7 +53,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const [isDrawerOpen, setDrawerOpen] = useState(false);
 
-  // ✅ SAVE CART TO LOCAL STORAGE
   useEffect(() => {
     try {
       localStorage.setItem(CART_KEY, JSON.stringify(items));
@@ -58,8 +62,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   }, [items]);
 
   const addToCart = useCallback((product: any, quantity: number, variant?: any) => {
+    // UPDATED: cart item ID now includes processor for proper merging isolation
+    // Format: productId-processor-ram-storage  (processor may be empty string)
     const id = variant
-      ? `${product.id}-${variant.ram}-${variant.storage}`
+      ? `${product.id}-${variant.processor || ""}-${variant.ram}-${variant.storage}`
       : String(product.id);
 
     const stock = variant ? variant.stock : product.stock || 0;
@@ -69,6 +75,16 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       product.images?.find((i: any) => i.is_primary)?.image ||
       product.images?.[0]?.image ||
       "";
+
+    // Build human-readable variant label
+    let variantLabel: string | undefined;
+    if (variant) {
+      const parts: string[] = [];
+      if (variant.processor) parts.push(variant.processor);
+      if (variant.ram) parts.push(variant.ram);
+      if (variant.storage) parts.push(variant.storage);
+      variantLabel = parts.join(" / ");
+    }
 
     let success = false;
 
@@ -97,8 +113,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             image,
             quantity,
             stock,
-            variant: variant ? `${variant.ram} / ${variant.storage}` : undefined,
-            variantId: variant?.id || null
+            variant: variantLabel,
+            variantId: variant?.id ?? null,
+            processor: variant?.processor ?? undefined,
+            ram: variant?.ram ?? undefined,
+            storage: variant?.storage ?? undefined,
           }
         ];
       }
@@ -115,10 +134,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       if (!item) return prev;
       if (quantity > item.stock) return prev;
       if (quantity <= 0) return prev.filter((i) => i.id !== id);
-
-      return prev.map((i) =>
-        i.id === id ? { ...i, quantity } : i
-      );
+      return prev.map((i) => (i.id === id ? { ...i, quantity } : i));
     });
   }, []);
 

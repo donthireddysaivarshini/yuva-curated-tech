@@ -8,6 +8,7 @@ import { TechJourney } from "@/components/home/TechJourney";
 import { AboutSnapshot } from "@/components/home/AboutSnapshot";
 import { PartnersSection } from "@/components/home/PartnersSection";
 import { ReviewsSection } from "@/components/home/ReviewsSection";
+import { BlogsSection } from "@/components/home/BlogsSection"; // ← NEW
 
 const HomePage = () => {
   const [storeData, setStoreData] = useState({
@@ -31,9 +32,7 @@ const HomePage = () => {
   });
 
   useEffect(() => {
-    // Load products
     storeService.getHomeData().then(setStoreData).catch(console.error);
-    // Load editable content
     contentService.getHomeContent().then(setContent).catch(console.error);
   }, []);
 
@@ -70,8 +69,10 @@ const HomePage = () => {
         link="/products?is_new_arrival=true"
       />
 
+      <BlogsSection /> {/* ← NEW — placed before reviews for editorial flow */}
+
       <PartnersSection />
-      <ReviewsSection reviews={content.reviews} />
+      <ReviewsSection />
     </main>
   );
 };

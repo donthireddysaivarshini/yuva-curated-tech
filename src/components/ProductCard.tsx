@@ -1,27 +1,7 @@
+//productcard
 import { Link } from "react-router-dom";
 import { Target, Star } from "lucide-react";
-
-// Define the API structure
-interface ApiProduct {
-  id: number;
-  title: string;
-  slug: string;
-  sku: string;
-  price: string | number;
-  original_price?: string | number;
-  discount_percentage?: number;
-  condition: string;
-  condition_display?: string;
-  brand_name: string;
-  category_name: string;
-  processor?: string;
-  ram?: string;
-  storage?: string;
-  usage_tags?: { id: number; name: string; slug: string }[];
-  images?: { id: number; image: string; is_primary: boolean }[];
-  average_rating?: number;
-  review_count?: number;
-}
+import { type ApiProduct, getVariantSummary, getCardPrice } from "@/types/product";
 
 const conditionColors: Record<string, string> = {
   like_new: "bg-primary text-primary-foreground",
@@ -32,17 +12,24 @@ const conditionColors: Record<string, string> = {
 
 const ProductCard = ({ product }: { product: ApiProduct }) => {
   const primaryImage = product.images?.[0]?.image || "/placeholder.png";
-  const price = Number(product.price);
-  const originalPrice = product.original_price ? Number(product.original_price) : null;
-  
-  // Logic: Only consider reviews if review_count is explicitly provided and greater than 0
-  const hasReviews = product.review_count && product.review_count > 0;
+
+  // ── Price: cheapest in-stock variant ────────────────────────────────────
+  const { price, originalPrice } = getCardPrice(product);
+
+  // ── Variant combination summary pills ───────────────────────────────────
+  // e.g. ["Core i7 | 16GB | 512GB", "Core i5 | 8GB | 256GB", "+2 more"]
+  // Derived purely from product.variants[] — no product-level specs used.
+  const variantSummary = getVariantSummary(product);
 
   return (
     <div className="group bg-card rounded-xl overflow-hidden shadow-ambient hover:shadow-lg transition-all duration-300 flex flex-col h-full">
       <Link to={`/product/${product.slug}`} className="block">
         <div className="relative bg-surface-low flex items-center justify-center aspect-square overflow-hidden p-4">
-          <span className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md text-[10px] font-display font-bold uppercase tracking-wider ${conditionColors[product.condition] || "bg-muted"}`}>
+          <span
+            className={`absolute top-3 left-3 z-10 px-2.5 py-1 rounded-md text-[10px] font-display font-bold uppercase tracking-wider ${
+              conditionColors[product.condition] || "bg-muted"
+            }`}
+          >
             {product.condition_display || product.condition}
           </span>
           <img
@@ -72,39 +59,63 @@ const ProductCard = ({ product }: { product: ApiProduct }) => {
           </h3>
         </Link>
 
-        {/* REVIEWS SECTION: Only renders if hasReviews is true */}
-      
-{/* REVIEWS SECTION: Only renders if count is > 0 */}
-{product.review_count > 0 && (
-  <div className="flex items-center gap-1 mt-1 mb-2">
-    <div className="flex text-yellow-400">
-      <Star className="w-3 h-3 fill-current" />
-    </div>
-    <span className="text-xs font-bold">{product.average_rating}</span>
-    <span className="text-[10px] text-muted-foreground">({product.review_count})</span>
-  </div>
-)}
+        {/* Reviews */}
+        {(product.review_count ?? 0) > 0 && (
+          <div className="flex items-center gap-1 mt-1 mb-2">
+            <div className="flex text-yellow-400">
+              <Star className="w-3 h-3 fill-current" />
+            </div>
+            <span className="text-xs font-bold">{product.average_rating}</span>
+            <span className="text-[10px] text-muted-foreground">({product.review_count})</span>
+          </div>
+        )}
 
-        <div className="flex flex-wrap gap-1.5 mt-2">
-          {product.processor && <span className="text-[10px] bg-muted px-2 py-0.5 rounded">{product.processor}</span>}
-          {product.ram && <span className="text-[10px] bg-muted px-2 py-0.5 rounded">{product.ram}</span>}
-          {product.storage && <span className="text-[10px] bg-muted px-2 py-0.5 rounded">{product.storage}</span>}
-        </div>
+        {/*
+          Variant combination summary.
+          Each pill shows one full combination: "processor | ram | storage".
+          The last pill may be "+N more" when variants exceed MAX_SHOWN.
+          Only rendered when the product has variants — no product-level specs.
+        */}
+        {variantSummary.length > 0 && (
+          <div className="flex flex-wrap gap-1.5 mt-2">
+            {variantSummary.map((label) => (
+              <span
+                key={label}
+                className={`text-[10px] px-2 py-0.5 rounded font-medium ${
+                  label.startsWith("+")
+                    ? "bg-primary/10 text-primary"
+                    : "bg-muted text-muted-foreground"
+                }`}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        )}
 
         <div className="mt-auto pt-4 flex items-end justify-between gap-2">
           <div>
-            <p className="font-display font-extrabold text-lg text-foreground">₹{price.toLocaleString("en-IN")}</p>
+            <p className="font-display font-extrabold text-lg text-foreground">
+              ₹{price.toLocaleString("en-IN")}
+            </p>
             <div className="flex items-center gap-2">
-                {originalPrice && originalPrice > price && (
-                <p className="text-xs text-muted-foreground line-through">₹{originalPrice.toLocaleString("en-IN")}</p>
-                )}
-                {product.discount_percentage && product.discount_percentage > 0 && (
-                    <span className="text-[10px] font-bold text-success">{product.discount_percentage}% OFF</span>
-                )}
+              {originalPrice && originalPrice > price && (
+                <p className="text-xs text-muted-foreground line-through">
+                  ₹{originalPrice.toLocaleString("en-IN")}
+                </p>
+              )}
+              {product.discount_percentage && product.discount_percentage > 0 && (
+                <span className="text-[10px] font-bold text-success">
+                  {product.discount_percentage}% OFF
+                </span>
+              )}
             </div>
           </div>
-          
-          <Link to={`/product/${product.slug}`} className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity">
+
+          <Link
+            to={`/product/${product.slug}`}
+            className="px-4 py-2 rounded-lg bg-primary text-primary-foreground text-xs font-bold hover:opacity-90 transition-opacity"
+          >
             View Details
           </Link>
         </div>

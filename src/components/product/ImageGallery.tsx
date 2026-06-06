@@ -1,3 +1,4 @@
+//reference product image gallery section
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, X, ZoomIn, Share2 } from "lucide-react";
 import { toast } from "sonner";

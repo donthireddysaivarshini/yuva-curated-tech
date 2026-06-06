@@ -1,3 +1,4 @@
+//checkoutpage
 import { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Loader2, Tag, X, ChevronRight, ShieldCheck, Truck, AlertCircle, Gift, CheckCircle } from "lucide-react";
