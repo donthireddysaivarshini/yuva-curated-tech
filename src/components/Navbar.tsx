@@ -200,7 +200,7 @@ const Navbar = () => {
                 <div className="max-h-96 overflow-y-auto border-t">
                   {isSearching ? <div className="p-8 text-center"><Loader2 className="animate-spin mx-auto text-primary" /></div> : 
                    searchResults.products.map((product) => (
-                    <Link key={product.id} to={`/products/${product.slug}`} onClick={() => setSearchOpen(false)} className="flex gap-4 p-4 hover:bg-muted border-b">
+                    <Link key={product.id} to={`/product/${product.slug}`} onClick={() => setSearchOpen(false)} className="flex gap-4 p-4 hover:bg-muted border-b">
                       {/* Image section removed */}
                       <div>
                         <div className="font-semibold">{product.title}</div>
