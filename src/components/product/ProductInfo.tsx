@@ -186,31 +186,26 @@ export default function ProductInfo({
 
 
       {/* PRICE (FIXED - BASE PRICE FIRST) */}
-      <div className="flex items-center gap-3">
-        {/* BASE PRICE ALWAYS FIRST */}
-        <span className="text-3xl font-black text-foreground">
-          ₹{basePrice.toLocaleString("en-IN")}
-        </span>
+      {/* ─── AFTER (FIXED CHANGE) ─── */}
+{/* PRICE (UPDATED TO DISPLAY ONLY THE FINAL VARIANT PRICE) */}
+<div className="flex items-center gap-3">
+  {/* Displays only the single active final price */}
+  <span className="text-3xl font-black text-foreground">
+    ₹{displayPrice.toLocaleString("en-IN")}
+  </span>
 
-        {/* VARIANT PRICE (ONLY IF DIFFERENT) */}
-        {activeVariant && displayPrice !== basePrice && (
-          <span className="text-xl text-primary font-semibold">
-            → ₹{displayPrice.toLocaleString("en-IN")}
-          </span>
-        )}
-
-        {/* ORIGINAL PRICE + DISCOUNT */}
-        {originalPrice > displayPrice && (
-          <>
-            <span className="text-xl text-muted-foreground line-through font-medium">
-              ₹{originalPrice.toLocaleString("en-IN")}
-            </span>
-            <span className="text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded">
-              {discount}% OFF
-            </span>
-          </>
-        )}
-      </div>
+  {/* ORIGINAL PRICE + DISCOUNT (COMPARED AGAINST THE FINAL DISPLAY PRICE) */}
+  {originalPrice > displayPrice && (
+    <>
+      <span className="text-xl text-muted-foreground line-through font-medium">
+        ₹{originalPrice.toLocaleString("en-IN")}
+      </span>
+      <span className="text-xs font-bold text-success bg-success/10 px-2 py-0.5 rounded">
+        {discount}% OFF
+      </span>
+    </>
+  )}
+</div>
 
 
       {/* Variant selectors — only show if variants exist */}

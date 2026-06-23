@@ -63,11 +63,25 @@ const ProductsPage = () => {
   const [sortBy, setSortBy] = useState("newest");
 
   // ── Fetch ───────────────────────────────────────────────────────────────
+  // ── Fetch ───────────────────────────────────────────────────────────────
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const data = await storeService.getProducts(Object.fromEntries(searchParams));
+        // 1. Convert search params to a mutable plain object
+        const paramsObj = Object.fromEntries(searchParams);
+
+        // 2. FIX: If the user came from a Google organic sitelink, strip out the forced best-seller filter
+        if (paramsObj.srsltid) {
+          delete paramsObj.srsltid; // Remove Google's tracking ID
+          
+          if (paramsObj.is_best_seller === 'true') {
+            delete paramsObj.is_best_seller; // Remove the forced filter so all 20 products load
+          }
+        }
+
+        // 3. Request cleaner data mapping from Django backend views
+        const data = await storeService.getProducts(paramsObj);
         const prodList: ApiProduct[] = Array.isArray(data) ? data : data.products || [];
         setProducts(prodList);
 
